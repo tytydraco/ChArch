@@ -1,0 +1,66 @@
+#!/bin/sh
+# Written by Draco (tytydraco) @ GitHub
+
+usage() {
+	echo "Usage:"
+	echo "	lsarch [-h] [-d directory]"
+	echo ""
+	echo "List all rootfs instances in the chroot container."
+	echo ""
+	echo "Options:"
+	echo "	-h: Show usage"
+	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
+}
+
+while getopts "hd:" opt; do
+	case ${opt} in
+		h)
+			usage
+			exit 0
+			;;
+		d)
+			CHROOT_DIR="$OPTARG"
+			;;
+		?)
+			usage
+			exit 1
+			;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Path containing rootfs tarball and all rootfs instances
+if [[ -z "$CHROOT_DIR" ]]
+then
+	# Prefer a standard Linux directory
+	if [[ -d "/home" ]]
+	then
+		CHROOT_DIR="/home/chroot"
+	else
+		CHROOT_DIR="/data/local/chroot"
+	fi
+fi
+
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="$PATH:/sbin/.magisk/busybox"
+
+# Check for required dependencies
+for dep in find
+do
+	if ! command -v $dep &> /dev/null
+	then
+		echo "[!] Missing $dep. Exiting."
+		exit 1
+	fi
+done
+
+# Check if chroot container exists
+if [ ! -d "$CHROOT_DIR" ]
+then
+	echo "[!] No container at $CHROOT_DIR. Exiting."
+	exit 1
+fi
+
+# Display paths to available rootfs instances
+find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d

@@ -1,0 +1,93 @@
+#!/bin/sh
+# Written by Draco (tytydraco) @ GitHub
+
+usage() {
+	echo "Usage:"
+	echo "	cparch [-d directory] <original-name> <new-name>"
+	echo ""
+	echo "Clone a rootfs and assign a new name within the same chroot container folder."
+	echo "The cloning process may take a while. Please be patient."
+	echo ""
+	echo "Options:"
+	echo "	-h: Show usage"
+	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
+}
+
+while getopts "hd::" opt; do
+	case ${opt} in
+		h)
+			usage
+			exit 0
+			;;
+		d)
+			CHROOT_DIR="$OPTARG"
+			;;
+		?)
+			usage
+			exit 1
+			;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Path containing rootfs tarball and all rootfs instances
+if [[ -z "$CHROOT_DIR" ]]
+then
+	# Prefer a standard Linux directory
+	if [[ -d "/home" ]]
+	then
+		CHROOT_DIR="/home/chroot"
+	else
+		CHROOT_DIR="/data/local/chroot"
+	fi
+fi
+
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="$PATH:/sbin/.magisk/busybox"
+
+# Check for required dependencies
+for dep in id unarch cp
+do
+	if ! command -v $dep &> /dev/null
+	then
+		echo "[!] Missing $dep. Exiting."
+		exit 1
+	fi
+done
+
+# Check for root permissions
+if [[ `id -u` -ne 0 ]]
+then
+	echo "[!] No root permissions. Exiting."
+	exit 1
+fi
+
+
+# Usage check
+if [[ "$#" -ne 2 ]]
+then
+	usage
+	exit 1
+fi
+
+# Check if chroot container exists
+if [[ ! -d "$CHROOT_DIR" ]]
+then
+	echo "[!] No container at $CHROOT_DIR. Exiting."
+	exit 1
+fi
+
+# Check for existing destination rootfs
+if [[ -d "$CHROOT_DIR/$2" ]]
+then
+	echo "[!] Rootfs with name $2 already exists. Exiting."
+	exit 1
+fi
+
+# Unmount and exit on fail
+CHROOT_DIR="$CHROOT_DIR" ROOTFS="$1" unarch
+[[ $? -ne 0 ]] && exit 1
+
+# Clone
+cp -Rp "$CHROOT_DIR/$1" "$CHROOT_DIR/$2"

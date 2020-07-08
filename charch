@@ -1,0 +1,240 @@
+#!/bin/sh
+# Written by Draco (tytydraco) @ GitHub
+
+usage() {
+	echo "Usage:"
+	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-c command]"
+	echo ""
+	echo "Create a rootfs instance or enter an existing one."
+	echo ""
+	echo "Options:"
+	echo "	-h: Show usage"
+	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
+	echo "	-u: Specify a URL to fetch a rootfs tarball from"
+	echo "	-f: Force a tarball refetch even if it already exists"
+	echo "	-n: The name of the rootfs instance to create or enter (default: rootfs)"
+	echo "	-c: Command to execute inside the rootfs instance (default: /bin/bash -l)"
+}
+
+while getopts "hd:u:fn:c:" opt; do
+	case ${opt} in
+		h)
+			usage
+			exit 0
+			;;
+		d)
+			CHROOT_DIR="$OPTARG"
+			;;
+		u)
+			ROOTFS_URL="$OPTARG"
+			;;
+		f)
+			FORCE_FETCH=1
+			;;
+		n)
+			ROOTFS="$OPTARG"
+			;;
+		c)
+			COMMAND="$OPTARG"
+			;;
+		?)
+			usage
+			exit 1
+			;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Path containing rootfs tarball and all rootfs instances
+if [[ -z "$CHROOT_DIR" ]]
+then
+	# Prefer a standard Linux directory
+	if [[ -d "/home" ]]
+	then
+		CHROOT_DIR="/home/chroot"
+	else
+		CHROOT_DIR="/data/local/chroot"
+	fi
+fi
+
+# The name of the current rootfs instance
+[[ -z "$ROOTFS" ]] && ROOTFS="rootfs"
+
+# Path to root of rootfs instance
+ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
+
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="$PATH:/sbin/.magisk/busybox"
+
+# Environmental variables for the chroot
+_PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+_HOME="/root"
+
+# Check for required dependencies
+for dep in id uname mount chroot tar mkdir awk grep rm sed find wc curl
+do
+	if ! command -v $dep &> /dev/null
+	then
+		echo "[!] Missing $dep. Exiting."
+		exit 1
+	fi
+done
+
+# Check for root permissions
+if [[ `id -u` -ne 0 ]]
+then
+	echo "[!] No root permissions. Exiting."
+	exit 1
+fi
+
+# Identify an appropriate rootfs tarball for the given architecture
+if [[ -z "$ROOTFS_URL" ]]
+then
+	ARCH=`uname -m`
+	if [[ "$ARCH" == *"aarch64"* ]] || [[ "$ARCH" == *"armv8"* ]]
+	then
+		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+	elif [[ "$ARCH" == *"armv5"* ]]
+	then
+		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv5-latest.tar.gz"
+	elif [[ "$ARCH" == *"armv7"* ]]
+	then
+		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz"
+	elif [[ "$ARCH" == *"x86_64"* ]]
+	then
+		ROOTFS_URL="https://archive.archlinux.org/iso/2020.07.01/archlinux-bootstrap-2020.07.01-x86_64.tar.gz"
+	else
+		echo "[!] Unsupported architecture: $ARCH. Exiting."
+		exit 1
+	fi
+else
+	# If manual rootfs URL, erase existing one to force fetch
+	FORCE_FETCH=1
+fi
+
+fetch_rootfs() {
+	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ $FORCE_FETCH -eq 1 ]]
+	then
+		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" $ROOTFS_URL
+
+		if [[ $? -ne 0 ]]
+		then
+			echo "[!] Failed to fetch rootfs tarball. Exiting."
+			exit 1
+		fi
+	fi
+}
+
+setup_rootfs() {
+	mkdir -p "$ROOTFS_DIR"
+	tar xf "$CHROOT_DIR/rootfs.tar.gz" -C "$ROOTFS_DIR" &> /dev/null
+
+	if [[ $? -ne 0 ]]
+	then
+		echo "[!] Failed to extract rootfs tarball. Exiting."
+		exit 1
+	fi
+
+	# Check for nested rootfs directory
+	local dircount=`ls "$ROOTFS_DIR" | wc -w`
+	if [[ $dircount -eq 1 ]]
+	then
+		local dirname=`ls "$ROOTFS_DIR" | head -n 1`
+		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
+		rm -rf "$dirname"
+	fi
+}
+
+setup_mounts() {
+	local mounts=`mount`
+	for mount in dev dev/pts proc sys
+	do
+		# Skip nonexistent mounts
+		[[ ! -d "/$mount" ]] && continue
+
+		# Create the mount point if it is missing
+		[[ ! -d "$ROOTFS_DIR/$mount" ]] && mkdir -p "$ROOTFS_DIR/$mount"
+
+		# Bind
+		! echo "$mounts" | grep -qs " $ROOTFS_DIR/$mount " && mount --bind "/$mount" "$ROOTFS_DIR/$mount"
+
+		# Fail check
+		if [[ $? -ne 0 ]]
+		then
+			echo "[!] Failed to mount $mount. Exiting."
+			exit 1
+		fi
+	done
+
+	# Use type-mount for tmpfs as there is no bind point
+	! echo "$mounts" | grep -qs " $ROOTFS_DIR/tmp " && mount -t tmpfs tmpfs "$ROOTFS_DIR/tmp/"
+
+	# Remount data partition with suid to allow sudo to function
+	local root_dir=`echo "$CHROOT_DIR" | awk -F "/" '{print $2}'`
+	local data_mount=`echo "$mounts" | grep -s " /$root_dir "`
+	[[ ! -z "$data_mount" ]] && mount -o remount,suid,exec /$root_dir
+}
+
+_chroot() {
+	# Consider piping commands to chroot
+	if [[ -z "$@" ]]
+	then
+		PATH="$_PATH" HOME="$_HOME" chroot "$ROOTFS_DIR" /bin/bash -l
+	else
+		PATH="$_PATH" HOME="$_HOME" chroot "$ROOTFS_DIR" $@
+	fi
+}
+
+post_install() {
+	# Add dns since userspace dns is volatile
+	rm "$ROOTFS_DIR/etc/resolv.conf"
+	echo "nameserver 1.1.1.1" > "$ROOTFS_DIR/etc/resolv.conf"
+	echo "nameserver 1.0.0.1" >> "$ROOTFS_DIR/etc/resolv.conf"
+
+	# Pacman
+	if [[ -f "$ROOTFS_DIR/etc/pacman.conf" ]]
+	then
+		# Fix broken space check for pacman in chroot
+		sed -i "s/^CheckSpace$/#CheckSpace/" "$ROOTFS_DIR/etc/pacman.conf"
+
+		# Update and populate pacman keys
+		_chroot pacman-key --init
+		_chroot pacman-key --populate
+
+		# Remove built-in linux kernel and firmware
+		_chroot pacman -Rcn --noconfirm linux-firmware
+	fi
+
+	# Apt
+	if [[ -d "$ROOTFS_DIR/etc/apt/" ]]
+	then
+		# Remove built-in linux kernel and firmware
+		_chroot apt-get -y remove --auto-remove linux-firmware
+		_chroot apt-get -y remove --auto-remove "^linux-image.*"
+	fi
+}
+
+# Create initial chroot home
+[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
+
+# Create rootfs instance
+if [[ ! -d "$ROOTFS_DIR" ]]
+then
+	# Fetch latest rootfs tarball for architecture
+	fetch_rootfs
+
+	# Extract tarball
+	setup_rootfs
+
+	# Mount host binds and Android-specific binds
+	setup_mounts
+
+	# Fix common chroot issues and do post-install config
+	post_install &> /dev/null
+else
+	# Do mounts if rootfs instance already exists
+	setup_mounts
+fi
+
+_chroot "$COMMAND"
