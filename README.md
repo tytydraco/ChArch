@@ -122,6 +122,14 @@ net_raw:x:3004:root
 2) `usermod -a -G inet <username>`
 3) `usermod -a -G net_raw <username>`
 
+## Q: Where am I supposed to find rootfs tarballs?
+A: I wish there was a universal rootfs tarball hub, but there isn't. Each distro has their own page with their own supported architectures. Here are some common distro rootfs tarball links.
+
+- [Arch Linux](http://fl.us.mirror.archlinuxarm.org/os/)
+- [Ubuntu](http://cdimage.ubuntu.com/ubuntu-base/releases/)
+- [CentOS](http://isoredirect.centos.org/altarch)
+- [Kali Linux](https://build.nethunter.com/kalifs/kalifs-latest/)
+
 ## Q: What is the default DNS?
 A: Using the DNS from the host machine is unreliable, especially on Android, as it is extremely volatile. The default DNS is from Cloudflare.
 
