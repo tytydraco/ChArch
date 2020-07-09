@@ -99,9 +99,9 @@ You can setup SSHD for wireless access to your chroot container from another dev
 7) On another machine, login using `ssh root@<android ip>` (default root password is `root`)
 
 # FAQ
-## Q: My non-user can't use the internet!
+## Q: My non-root users can't use the internet!
 
-A: You might need to add your non-root user to the net groups.
+A: You might need to add your non-root users to the net groups.
 
 1) Type `groups` and find the net related ones (`inet`, `net_raw`)
 
