@@ -142,7 +142,7 @@ setup_rootfs() {
 	then
 		local dirname=`ls "$ROOTFS_DIR" | head -n 1`
 		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
-		rm -rf "$dirname"
+		rm -rf "$ROOTFS_DIR/$dirname"
 	fi
 }
 
