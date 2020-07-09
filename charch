@@ -171,7 +171,13 @@ setup_mounts() {
 	done
 
 	# Use type-mount for tmpfs as there is no bind point
-	! echo "$mounts" | grep -qs " $ROOTFS_DIR/tmp " && mount -t tmpfs tmpfs "$ROOTFS_DIR/tmp/"
+	if ! echo "$mounts" | grep -qs " $ROOTFS_DIR/tmp "
+	then
+		# Create the mount point if it is missing
+		[[ ! -d "$ROOTFS_DIR/tmp" ]] && mkdir -p "$ROOTFS_DIR/tmp"
+
+		mount -t tmpfs tmpfs "$ROOTFS_DIR/tmp/"
+	fi
 
 	# Remount data partition with suid to allow sudo to function
 	local root_dir=`echo "$CHROOT_DIR" | awk -F "/" '{print $2}'`
