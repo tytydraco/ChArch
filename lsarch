@@ -13,7 +13,7 @@ usage() {
 }
 
 while getopts "hd:" opt; do
-	case ${opt} in
+	case $opt in
 		h)
 			usage
 			exit 0
