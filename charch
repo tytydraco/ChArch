@@ -177,12 +177,15 @@ setup_mounts() {
 }
 
 _chroot() {
+	# Call with full path
+	local chroot_path=`which chroot`
+
 	# Consider piping commands to chroot
 	if [[ -z "$@" ]]
 	then
-		PATH="$_PATH" HOME="$_HOME" chroot "$ROOTFS_DIR" /bin/bash -l
+		PATH="$_PATH" HOME="$_HOME" "$chroot_path" "$ROOTFS_DIR" /bin/bash -l
 	else
-		PATH="$_PATH" HOME="$_HOME" chroot "$ROOTFS_DIR" $@
+		PATH="$_PATH" HOME="$_HOME" "$chroot_path" "$ROOTFS_DIR" $@
 	fi
 }
 
