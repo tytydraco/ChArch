@@ -156,14 +156,17 @@ setup_mounts() {
 		# Create the mount point if it is missing
 		[[ ! -d "$ROOTFS_DIR/$mount" ]] && mkdir -p "$ROOTFS_DIR/$mount"
 
-		# Bind
-		! echo "$mounts" | grep -qs " $ROOTFS_DIR/$mount " && mount --bind "/$mount" "$ROOTFS_DIR/$mount"
-
-		# Fail check
-		if [[ $? -ne 0 ]]
+		# Bind if not already mounted
+		if ! echo "$mounts" | grep -qs " $ROOTFS_DIR/$mount "
 		then
-			echo "[!] Failed to mount $mount. Exiting."
-			exit 1
+			mount --bind "/$mount" "$ROOTFS_DIR/$mount"
+
+			# Fail check
+			if [[ $? -ne 0 ]]
+			then
+				echo "[!] Failed to mount $mount. Exiting."
+				exit 1
+			fi
 		fi
 	done
 
