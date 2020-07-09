@@ -49,7 +49,7 @@ fi
 # Check for required dependencies
 for dep in id unarch cp
 do
-	if ! command -v $dep &> /dev/null
+	if ! command -v "$dep" &> /dev/null
 	then
 		echo "[!] Missing $dep. Exiting."
 		exit 1

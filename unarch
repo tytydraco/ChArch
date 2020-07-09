@@ -58,7 +58,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Check for required dependencies
 for dep in id mount umount awk grep uniq tac
 do
-	if ! command -v $dep &> /dev/null
+	if ! command -v "$dep" &> /dev/null
 	then
 		echo "[!] Missing $dep. Exiting."
 		exit 1
@@ -91,7 +91,7 @@ if command -v lsof &> /dev/null
 then
 	for pid in `lsof -t "$ROOTFS_DIR"`
 	do
-		kill $pid
+		kill "$pid"
 	done
 fi
 

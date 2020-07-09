@@ -74,7 +74,7 @@ _HOME="/root"
 # Check for required dependencies
 for dep in id uname mount chroot tar mkdir awk grep rm sed find wc curl
 do
-	if ! command -v $dep &> /dev/null
+	if ! command -v "$dep" &> /dev/null
 	then
 		echo "[!] Missing $dep. Exiting."
 		exit 1
@@ -114,9 +114,9 @@ fetch_rootfs() {
 		exit 1
 	fi
 
-	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ $FORCE_FETCH -eq 1 ]]
+	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
 	then
-		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" $ROOTFS_URL
+		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" "$ROOTFS_URL"
 
 		if [[ $? -ne 0 ]]
 		then
@@ -138,7 +138,7 @@ setup_rootfs() {
 
 	# Check for nested rootfs directory
 	local dircount=`ls "$ROOTFS_DIR" | wc -w`
-	if [[ $dircount -eq 1 ]]
+	if [[ "$dircount" -eq 1 ]]
 	then
 		local dirname=`ls "$ROOTFS_DIR" | head -n 1`
 		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;

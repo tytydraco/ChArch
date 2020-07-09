@@ -62,7 +62,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Check for required dependencies
 for dep in unarch rm id
 do
-	if ! command -v $dep &> /dev/null
+	if ! command -v "$dep" &> /dev/null
 	then
 		echo "[!] Missing $dep. Exiting."
 		exit 1
@@ -84,7 +84,7 @@ then
 fi
 
 # Handle tarball removal
-if [[ $RM_TARBALL -eq 1 ]]
+if [[ "$RM_TARBALL" -eq 1 ]]
 then
 	if [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]]
 	then
