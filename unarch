@@ -96,14 +96,26 @@ then
 fi
 
 # Unmount host binds
-for mount in `mount | grep " $ROOTFS_DIR" | awk '{print $3}' | uniq | tac`
-do
-	umount "$mount"
+_umount() {
+	local name="$1"
 
-	# Fail check
-	if [[ $? -ne 0 ]]
+	# Bind if not already mounted
+	if mount | grep -qs " $ROOTFS_DIR/$name "
 	then
-		echo "[!] Failed to unmount $mount. Try rebooting. Exiting."
-		exit 1
+		umount "$ROOTFS_DIR/$name"
+
+		# Fail check
+		if [[ $? -ne 0 ]]
+		then
+			echo "[!] Failed to unmount $name. Try rebooting. Exiting."
+			exit 1
+		fi
 	fi
-done
+}
+
+# Unmount guest filesystems
+_umount dev/pts
+_umount dev
+_umount proc
+_umount sys
+_umount tmp
