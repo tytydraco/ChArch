@@ -10,9 +10,10 @@ usage() {
 	echo "Options:"
 	echo "	-h: Show usage"
 	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
+	echo "	-t: List existing rootfs tarballs"
 }
 
-while getopts "hd:" opt; do
+while getopts "hd:t" opt; do
 	case $opt in
 		h)
 			usage
@@ -20,6 +21,9 @@ while getopts "hd:" opt; do
 			;;
 		d)
 			CHROOT_DIR="$OPTARG"
+			;;
+		t)
+			LIST_TARBALLS=1
 			;;
 		?)
 			usage
@@ -63,4 +67,9 @@ then
 fi
 
 # Display paths to available rootfs instances
-find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d
+if [[ "$LIST_TARBALLS" -eq 1 ]]
+then
+	find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type f -name "*.tar.gz"
+else
+	find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d
+fi
