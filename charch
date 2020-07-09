@@ -101,11 +101,8 @@ then
 	elif [[ "$ARCH" == *"armv7"* ]]
 	then
 		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz"
-	elif [[ "$ARCH" == *"x86_64"* ]]
-	then
-		ROOTFS_URL="https://archive.archlinux.org/iso/2020.07.01/archlinux-bootstrap-2020.07.01-x86_64.tar.gz"
 	else
-		echo "[!] Unsupported architecture: $ARCH. Exiting."
+		echo "[!] No default tarball URL for $ARCH. Specify one with charch -u <url>. Exiting."
 		exit 1
 	fi
 else

@@ -18,11 +18,12 @@ A set of scripts to manage chroot containers on Linux.
 ## Android
 Navigate to the [Magisk Module](https://github.com/tytydraco/ChArch-Magisk-Module) page and follow the instructions there.
 
-# Officially Supported Architectures
+# Architectures With Default Arch Linux Support
+If no `-u` option is given to `charch` for these architecures, ChArch will choose the latest ARM Arch Linux tarball. Other architectures require a URL to be specified.
+
 - armv5
 - armv7
 - armv8 / aarch64
-- x86_64
 
 # Features
 - Low learning curve, high skill capacity
@@ -31,15 +32,17 @@ Navigate to the [Magisk Module](https://github.com/tytydraco/ChArch-Magisk-Modul
 - Default configuration provided per-architecture
 
 # Tutorials
+Remember: If you are using a non-ARM device, you MUST specify a rootfs tarball URL. ARM devices are specifically supported by Arch Linux with a hardcoded URL pointing to the latest full rootfs tarball. Other architectures are not so lucky.
+
 ## Basic
 This tutorial is for those who don't want to do any manual configuration, just a simple isolated chroot container. The default configuration is set to setup Arch Linux in either `/home/chroot/` or `/data/local/chroot/` depending if your host device is a Linux base or an Android base.
 
 Let's start!
-1) With root permissions, type `charch`. This will fetch the latest rootfs tarball from Arch Linux directly and automatically configure and enter it.
+1) With root permissions, type `charch`. This will fetch the latest rootfs tarball from Arch Linux directly and automatically configure and enter it. If you are not using an ARM device, you will need to specify a URL to fetch the Arch Linux rootfs tarball from. Sadly, x86_64 does not have a fully functioning prebuilt rootfs tarball like ARM does, but it does have an extremely minimal bootstrap image. Head over to the [Arch Linux Archives](https://archive.archlinux.org/iso/) to find it. Copy the URL for your architecture and use `charch -u <url>`.
 
 If all goes well, you should be logged in as root in your Arch Linux instance. If you get an error, head over to [issues](https://github.com/tytydraco/ChArch/issues) and provide a log to find help on fixing the bug.
 
-2) The first thing you may want to do is update your packages. Type `pacman -Syu` and confirm your upgrades.
+2) The first thing you may want to do is update your packages. Type `pacman -Syu` and confirm your upgrades. If you are using the bootstrap rootfs tarball, this may not work as your pacman repositories are not setup. You will need to configure this manually.
 3) Once you are finished in your Arch Linux instance, type `exit` to return to your host terminal.
 4) You may want to unmount your host partitions from the Arch Linux instance. Type `unarch` to kill any running processes and proceed with the unmount. If you receive an error stating that the unmount failed, you may need to either manually kill any running processes in the Arch Linux instance, or reboot your host device to kill everything and unmount automatically.
 5) If you would like to remove your Arch Linux instance, type `rmarch` to completely remove it. If you are planning on following the next tutorials, skip this step.
