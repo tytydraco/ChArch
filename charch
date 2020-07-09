@@ -146,38 +146,56 @@ setup_rootfs() {
 	fi
 }
 
-setup_mounts() {
-	local mounts=`mount`
-	for mount in dev dev/pts proc sys
-	do
-		# Skip nonexistent mounts
-		[[ ! -d "/$mount" ]] && continue
+_mount() {
+	local type="$1"
+	local name="$2"
 
-		# Create the mount point if it is missing
-		[[ ! -d "$ROOTFS_DIR/$mount" ]] && mkdir -p "$ROOTFS_DIR/$mount"
+	# Create the mount point if it is missing
+	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
-		# Bind if not already mounted
-		if ! echo "$mounts" | grep -qs " $ROOTFS_DIR/$mount "
-		then
-			mount --bind "/$mount" "$ROOTFS_DIR/$mount"
-
-			# Fail check
-			if [[ $? -ne 0 ]]
-			then
-				echo "[!] Failed to mount $mount. Exiting."
-				exit 1
-			fi
-		fi
-	done
-
-	# Use type-mount for tmpfs as there is no bind point
-	if ! echo "$mounts" | grep -qs " $ROOTFS_DIR/tmp "
+	# Bind if not already mounted
+	if ! mount | grep -qs " $ROOTFS_DIR/$name "
 	then
-		# Create the mount point if it is missing
-		[[ ! -d "$ROOTFS_DIR/tmp" ]] && mkdir -p "$ROOTFS_DIR/tmp"
+		mount -t "$type" "$type" "$ROOTFS_DIR/$name"
 
-		mount -t tmpfs tmpfs "$ROOTFS_DIR/tmp/"
+		# Fail check
+		if [[ $? -ne 0 ]]
+		then
+			echo "[!] Failed to mount $type. Exiting."
+			exit 1
+		fi
 	fi
+}
+
+_bind() {
+	local name="$1"
+
+	# Create the mount point if it is missing
+	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
+
+	# Bind if not already mounted
+	if ! mount | grep -qs " $ROOTFS_DIR/$name "
+	then
+		mount --bind "/$name" "$ROOTFS_DIR/$name"
+
+		# Fail check
+		if [[ $? -ne 0 ]]
+		then
+			echo "[!] Failed to mount $name. Exiting."
+			exit 1
+		fi
+	fi
+}
+
+setup_mounts() {
+	# Bind dev for hardware device access
+	_bind dev dev
+
+	# Create fresh mounts for these
+	_mount devpts dev/pts
+	_mount proc proc
+	_mount sysfs sys
+	_mount tmpfs tmp
 
 	# Remount data partition with suid to allow sudo to function
 	local root_dir=`echo "$CHROOT_DIR" | awk -F "/" '{print $2}'`
