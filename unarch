@@ -102,7 +102,7 @@ _umount() {
 	# Bind if not already mounted
 	if mount | grep -qs " $ROOTFS_DIR/$name "
 	then
-		umount "$ROOTFS_DIR/$name"
+		umount -f "$ROOTFS_DIR/$name"
 
 		# Fail check
 		if [[ $? -ne 0 ]]
