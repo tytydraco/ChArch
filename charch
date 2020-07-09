@@ -101,9 +101,6 @@ then
 	elif [[ "$ARCH" == *"armv7"* ]]
 	then
 		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz"
-	else
-		echo "[!] No default tarball URL for $ARCH. Specify one with charch -u <url>. Exiting."
-		exit 1
 	fi
 else
 	# If manual rootfs URL, erase existing one to force fetch
@@ -111,6 +108,12 @@ else
 fi
 
 fetch_rootfs() {
+	if [[ -z "$ROOTFS_URL" ]]
+	then
+		echo "[!] No default tarball URL for $ARCH. Specify one with charch -u <url>. Exiting."
+		exit 1
+	fi
+
 	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ $FORCE_FETCH -eq 1 ]]
 	then
 		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" $ROOTFS_URL
