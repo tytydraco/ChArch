@@ -104,7 +104,7 @@ then
 fi
 
 # Try to unmount rootfs mounts
-CHROOT_DIR="$CHROOT_DIR" ROOTFS="$ROOTFS" unarch
+unarch -d "$CHROOT_DIR" -n "$ROOTFS"
 
 # If unmount failed, exit here to avoid corruption
 [[ $? -ne 0 ]] && exit 1

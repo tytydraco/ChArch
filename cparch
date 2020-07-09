@@ -86,7 +86,7 @@ then
 fi
 
 # Unmount and exit on fail
-CHROOT_DIR="$CHROOT_DIR" ROOTFS="$1" unarch
+unarch -d "$CHROOT_DIR" -n "$1"
 [[ $? -ne 0 ]] && exit 1
 
 # Clone
