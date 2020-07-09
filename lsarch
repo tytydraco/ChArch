@@ -50,7 +50,7 @@ fi
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in find
+for dep in id find
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -58,6 +58,13 @@ do
 		exit 1
 	fi
 done
+
+# Check for root permissions
+if [[ `id -u` -ne 0 ]]
+then
+	echo "[!] No root permissions. Exiting."
+	exit 1
+fi
 
 # Check if chroot container exists
 if [ ! -d "$CHROOT_DIR" ]
