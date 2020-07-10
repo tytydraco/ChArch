@@ -73,7 +73,7 @@ This tutorial is for power users who would like to try a different Linux flavor 
 6) Let's practice cloning a rootfs instance. Type `cparch kali kali_bk` to backup your rootfs instance. This will take a while.
 7) Type `lsarch` to see your rootfs instances. You should see both your original `kali` instance and your `kali_bk` instance.
 
-# Sideloading
+## Sideloading
 If you have a custom rootfs tarball that you want to use, but don't want to specify a URL to `charch`, you can manually sideload a tarball.
 
 1) Navigate to your chroot container of choice. The default is `/home/chroot` for Linux and `/data/local/chroot/` for Android.
@@ -87,6 +87,16 @@ If your image is already extracted, or you'd like to sideload a premade rootfs, 
 1) Navigate to your chroot container of choice. The default is `/home/chroot` for Linux and `/data/local/chroot/` for Android.
 2) Copy your extracted rootfs here (the final folder could look like `/home/chroot/custom/`).
 3) You can directly enter the rootfs using `charch -n <foldername>` (the command could look like `charch -n custom`).
+
+## (Android) Using External Drives
+Some power users may prefer to keep their ChArch folder on a MicroSD card or a USB OTG flash drive. There are a few steps we need to take.
+
+1) First we need to figure out which device our external drive is on. With your drive unplugged, type `blkid` as root. Then plug in your drive, and type it again. You should see a new entry show up at the very bottom. It might look something like `/dev/block/sda`, or maybe `/dev/block/sdg`. Keep this path in your memory for later.
+2) For chroot to work, your drive must be formatted as a UNIX compatible filesystem. The most popular choices are `ext4` and `f2fs`. If your device kernel supports `f2fs`, I'd suggest using it since it is optimized for flash storage. However, if you are in need of compatibility (i.e. using this ChArch external drive on older devices), I'd suggest `ext4`, as all Android devices support it. Type `mkfs.ext4 -f /dev/block/***`, where `***` is specific to your device. Replace `mkfs.ext4` with `mkfs.f2fs` if you chose to use `f2fs` instead of `ext4`.
+3) Now, we need to mount the drive. Type `mount /dev/block/*** /mnt`, replacing `***` with the device specific hardware ID (obviously).
+4) Time to create your ChArch directory! Type `charch -d /mnt` to use the default configuration. Note the `-d /mnt`, where `/mnt` is the path to your mounted external drive. Most ChArch commands from now on need a `-d` option if you want it to execute with respect to the external drive.
+5) To unmount your rootfs instance, we'll use a similar process to Step #4. Type `unarch -d /mnt`.
+6) To unmount your external drive completely, we need to unmount it from the `/mnt` folder. Type `umount /mnt`.
 
 # Chroot Post-Install
 ## User Configuration
