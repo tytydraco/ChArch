@@ -72,7 +72,7 @@ _PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 _HOME="/root"
 
 # Check for required dependencies
-for dep in id uname mount chroot tar mkdir awk grep rm sed find wc curl
+for dep in id uname mount mountpoint chroot tar mkdir awk grep rm sed find wc curl
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -154,7 +154,7 @@ _mount() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mount | grep -qs " $ROOTFS_DIR/$name "
+	if ! mountpoint -q "$ROOTFS_DIR/$name"
 	then
 		mount -t "$type" "$type" "$ROOTFS_DIR/$name"
 
@@ -174,7 +174,7 @@ _bind() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mount | grep -qs " $ROOTFS_DIR/$name "
+	if ! mountpoint -q "$ROOTFS_DIR/$name"
 	then
 		mount --bind "/$name" "$ROOTFS_DIR/$name"
 

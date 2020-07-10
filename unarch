@@ -56,7 +56,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in id mount umount awk grep uniq tac
+for dep in id mount mountpoint umount awk grep uniq tac
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -99,8 +99,8 @@ fi
 _umount() {
 	local name="$1"
 
-	# Bind if not already mounted
-	if mount | grep -qs " $ROOTFS_DIR/$name "
+	# Unmount if not already mounted
+	if mountpoint -q "$ROOTFS_DIR/$name"
 	then
 		umount -f "$ROOTFS_DIR/$name" &> /dev/null
 
