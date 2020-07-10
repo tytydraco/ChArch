@@ -100,7 +100,7 @@ _umount() {
 	local name="$1"
 
 	# Unmount if not already mounted
-	if mountpoint -q "$ROOTFS_DIR/$name"
+	if mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
 	then
 		umount -f "$ROOTFS_DIR/$name" &> /dev/null
 

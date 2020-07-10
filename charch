@@ -174,7 +174,7 @@ _bind() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mountpoint -q "$ROOTFS_DIR/$name"
+	if ! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
 	then
 		mount --bind "/$name" "$ROOTFS_DIR/$name"
 
