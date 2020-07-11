@@ -226,9 +226,9 @@ _chroot() {
 	# Consider piping commands to chroot
 	if [[ -z "$@" ]]
 	then
-		env "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" /bin/bash -l
+		env -i "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" /bin/bash -l
 	else
-		env "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
+		env -i "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
 	fi
 }
 
