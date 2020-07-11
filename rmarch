@@ -11,7 +11,7 @@ usage() {
 	echo "	-h: Show usage"
 	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
 	echo "	-n: The name of the rootfs instance to remove (default: rootfs)"
-	echo "	-t: Remove the rootfs tarball (overrides other options)"
+	echo "	-t: Remove the rootfs tarball if it exists"
 }
 
 while getopts "hd:n:t" opt; do
@@ -84,17 +84,8 @@ then
 fi
 
 # Handle tarball removal
-if [[ "$RM_TARBALL" -eq 1 ]]
-then
-	if [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]]
-	then
-		rm "$CHROOT_DIR/rootfs.tar.gz"
-		exit 0
-	else
-		echo "[!] No tarball found in $CHROOT_DIR. Exiting."
-		exit 1
-	fi
-fi
+[[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]] &&
+	rm "$CHROOT_DIR/rootfs.tar.gz"
 
 # Check if rootfs exists
 if [[ ! -d "$ROOTFS_DIR" ]]
