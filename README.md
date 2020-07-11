@@ -1,6 +1,23 @@
 # ChArch
 A set of scripts to manage chroot containers on Linux.
 
+# Features
+- Low learning curve. Even Linux noobs will have an easy time with ChArch.
+- Portable. There is very little setup required, and you can take your rootfs instances with you on an external drive.
+- Fast. ChArch uses raw filesystems as opposed to other solutions that create and mount disk images, resulting in less I/O overhead.
+- Quick Install. With reasonably fast network speeds, ChArch can configure an entire rootfs instance in less than 5 minutes. Removing the tarball download from the equation, ChArch can do it in less than 15 seconds.
+- Small. ChArch removes the Linux Kernel images and firmware packages post-install to reduce the usual 500 MiB rootfs instance to around 120 MiB.
+- Compatible. ChArch uses relatively few dependencies. On Android, Magisk BusyBox support is added as a fallback to support more devices.
+- Non-hacky. Unlike other solutions that download old images or use manual package installation in a bootstrap environment, ChArch uses a rootfs tarball base that is provided by you, the user. For Arch Linux ARM devices, the latest rootfs tarball is used by default.
+- Seamless. ChArch supports multiple running rootfs instances at the same time, and even in the background.
+
+# Architectures With Default Arch Linux Support
+If no `-u` option is given to `charch` for these architecures, ChArch will choose the latest ARM Arch Linux tarball. Other architectures require a URL to be specified.
+
+- armv5
+- armv7
+- armv8 / aarch64
+
 # Install
 ## Linux
 ### Option A) Path Install
@@ -23,23 +40,6 @@ Or if you prefer to do each step manually:
 
 ## Android
 Navigate to the [Magisk Module](https://github.com/tytydraco/ChArch-Magisk-Module) page and follow the instructions there.
-
-# Architectures With Default Arch Linux Support
-If no `-u` option is given to `charch` for these architecures, ChArch will choose the latest ARM Arch Linux tarball. Other architectures require a URL to be specified.
-
-- armv5
-- armv7
-- armv8 / aarch64
-
-# Features
-- Low learning curve. Even Linux noobs will have an easy time with ChArch.
-- Portable. There is very little setup required, and you can take your rootfs instances with you on an external drive.
-- Fast. ChArch uses raw filesystems as opposed to other solutions that create and mount disk images, resulting in less I/O overhead.
-- Quick Install. With reasonably fast network speeds, ChArch can configure an entire rootfs instance in less than 5 minutes. Removing the tarball download from the equation, ChArch can do it in less than 15 seconds.
-- Small. ChArch removes the Linux Kernel images and firmware packages post-install to reduce the usual 500 MiB rootfs instance to around 120 MiB.
-- Compatible. ChArch uses relatively few dependencies. On Android, Magisk BusyBox support is added as a fallback to support more devices.
-- Non-hacky. Unlike other solutions that download old images or use manual package installation in a bootstrap environment, ChArch uses a rootfs tarball base that is provided by you, the user. For Arch Linux ARM devices, the latest rootfs tarball is used by default.
-- Seamless. ChArch supports multiple running rootfs instances at the same time, and even in the background.
 
 # Tutorials
 Remember: If you are using a non-ARM device, you MUST specify a rootfs tarball URL. ARM devices are specifically supported by Arch Linux with a hardcoded URL pointing to the latest full rootfs tarball. Other architectures are not so lucky.
@@ -121,9 +121,30 @@ You can setup SSHD for wireless access to your chroot container from another dev
 6) To start the SSHD server, run `/usr/bin/sshd`
 7) On another machine, login using `ssh root@<android ip>` (default root password is `root`)
 
+# Troubleshooting
+## Missing Dependencies
+Depending on your system, you may lack a few dependencies for ChArch. You can either manually install the missing package, or try installing BusyBox.
+
+## No Default Tarball URL
+If you are not using an ARM based device, you need to specify a rootfs tarball URL with `charch -u`. See the FAQ to find some common places to find them.
+
+## Failed To Extract Tarball
+Sometimes, your tarball download may become corrupted. Try deleting the tarball and redownloading it: `rmarch -t`.
+
+## No Container
+You don't have a container in the default `/home/chroot/` or `/data/local/chroot/` directory. If you specified a different one with `charch -d`, make sure to specify it to most of the other ChArch commands as well.
+
+## No Instance
+You  don't have a rootfs instance with the default `rootfs` name. If you specified a different one with `charch -n`, make sure to specify it to most of the other ChArch commands as well.
+
+## Container Contains Rootfs Instances
+You need to remove each rootfs instance before you can remove the entire chroot container with `rmarch -a`. Use `lsarch` to list the rootfs instances and remove each one with `rmarch -n`.
+
+## Failed To Unmount
+ChArch tries to kill all of the rootfs instance processes before unmounting it. Sometimes, some processes remain and prevent an unmount. You can either try to enter the rootfs instance and kill the processes manually, or reboot your device to automatically kill every process and unmount everything.
+
 # FAQ
 ## Q: My non-root users can't use the internet!
-
 A: You might need to add your non-root users to the net groups.
 
 1) Type `groups` and find the net related ones (`inet`, `net_raw`)
