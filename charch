@@ -76,8 +76,10 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Environmental variables for the chroot
-_PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
-_HOME="/root"
+_ENV=(
+	PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+	HOME="/root"
+)
 
 # Check for required dependencies
 for dep in id uname mount mountpoint chroot tar mkdir awk grep rm sed find wc curl unarch
@@ -223,9 +225,9 @@ _chroot() {
 	# Consider piping commands to chroot
 	if [[ -z "$@" ]]
 	then
-		PATH="$_PATH" HOME="$_HOME" "$chroot_path" "$ROOTFS_DIR" /bin/bash -l
+		env "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" /bin/bash -l
 	else
-		PATH="$_PATH" HOME="$_HOME" "$chroot_path" "$ROOTFS_DIR" $@
+		env "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
 	fi
 }
 
