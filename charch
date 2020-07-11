@@ -3,7 +3,7 @@
 
 usage() {
 	echo "Usage:"
-	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-c command]"
+	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-U] [-c command]"
 	echo ""
 	echo "Create a rootfs instance or enter an existing one."
 	echo ""
@@ -14,10 +14,11 @@ usage() {
 	echo "	-f: Force a tarball refetch even if it already exists"
 	echo "	-n: The name of the rootfs instance to create or enter (default: rootfs)"
 	echo "	-i: Create a fresh /dev mount in the rootfs instance instead of binding it."
+	echo "	-U: Unmount the rootfs instance automatically after exiting."
 	echo "	-c: Command to execute inside the rootfs instance (default: /bin/bash -l)"
 }
 
-while getopts "hd:u:fn:ic:" opt; do
+while getopts "hd:u:fn:iUc:" opt; do
 	case $opt in
 		h)
 			usage
@@ -37,6 +38,9 @@ while getopts "hd:u:fn:ic:" opt; do
 			;;
 		i)
 			ISOLATED=1
+			;;
+		U)
+			UNMOUNT=1
 			;;
 		c)
 			COMMAND="$OPTARG"
@@ -76,7 +80,7 @@ _PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 _HOME="/root"
 
 # Check for required dependencies
-for dep in id uname mount mountpoint chroot tar mkdir awk grep rm sed find wc curl
+for dep in id uname mount mountpoint chroot tar mkdir awk grep rm sed find wc curl unarch
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -277,4 +281,8 @@ else
 	setup_mounts
 fi
 
+# Enter chroot environment
 _chroot "$COMMAND"
+
+# Try to unmount rootfs mounts
+[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" -n "$ROOTFS"
