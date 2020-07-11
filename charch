@@ -212,9 +212,8 @@ setup_mounts() {
 	_mount tmpfs tmp
 
 	# Remount data partition with suid to allow sudo to function
-	local root_dir=`echo "$CHROOT_DIR" | awk -F "/" '{print $2}'`
-	local data_mount=`echo "$mounts" | grep -s " /$root_dir "`
-	[[ ! -z "$data_mount" ]] && mount -o remount,suid,exec /$root_dir
+	local root_dir=`readlink -f "$CHROOT_DIR" | awk -F "/" '{print $2}'`
+	mountpoint -q "/$root_dir" && mount -o remount,suid,exec "/$root_dir"
 }
 
 _chroot() {
