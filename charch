@@ -13,8 +13,8 @@ usage() {
 	echo "	-u: Specify a URL to fetch a rootfs tarball from"
 	echo "	-f: Force a tarball refetch even if it already exists"
 	echo "	-n: The name of the rootfs instance to create or enter (default: rootfs)"
-	echo "	-i: Create a fresh /dev mount in the rootfs instance instead of binding it."
-	echo "	-U: Unmount the rootfs instance automatically after exiting."
+	echo "	-i: Create a fresh /dev mount in the rootfs instance instead of binding it"
+	echo "	-U: Unmount the rootfs instance automatically after exiting"
 	echo "	-c: Command to execute inside the rootfs instance (default: /bin/bash -l)"
 }
 
