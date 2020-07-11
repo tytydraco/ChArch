@@ -3,7 +3,7 @@
 
 usage() {
 	echo "Usage:"
-	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-c command]"
+	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-c command]"
 	echo ""
 	echo "Create a rootfs instance or enter an existing one."
 	echo ""
@@ -13,10 +13,11 @@ usage() {
 	echo "	-u: Specify a URL to fetch a rootfs tarball from"
 	echo "	-f: Force a tarball refetch even if it already exists"
 	echo "	-n: The name of the rootfs instance to create or enter (default: rootfs)"
+	echo "	-i: Create a fresh /dev mount in the rootfs instance instead of binding it."
 	echo "	-c: Command to execute inside the rootfs instance (default: /bin/bash -l)"
 }
 
-while getopts "hd:u:fn:c:" opt; do
+while getopts "hd:u:fn:ic:" opt; do
 	case $opt in
 		h)
 			usage
@@ -33,6 +34,9 @@ while getopts "hd:u:fn:c:" opt; do
 			;;
 		n)
 			ROOTFS="$OPTARG"
+			;;
+		i)
+			ISOLATED=1
 			;;
 		c)
 			COMMAND="$OPTARG"
@@ -188,8 +192,14 @@ _bind() {
 }
 
 setup_mounts() {
-	# Bind dev for hardware device access
-	_bind dev dev
+	if [[ "$ISOLATED" -eq 1 ]]
+	then
+		# Create a fresh dev mount without host hardware access
+		_mount tmpfs dev
+	else
+		# Bind dev for hardware device access
+		_bind dev dev
+	fi
 
 	# Create fresh mounts for these
 	_mount devpts dev/pts
