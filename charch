@@ -79,6 +79,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 _ENV=(
 	PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 	HOME="/root"
+	SHELL="/bin/bash"
 )
 
 # Check for required dependencies
