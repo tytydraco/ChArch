@@ -9,10 +9,16 @@ A set of scripts to manage chroot containers on Linux.
 3) Add `export PATH="$PATH:</path/to/ChArch/>"` to an shell profile of your choice
 
 ### Option B) Direct Install
+In a root shell, type this comamnd to clone the latest ChArch shell commands into your `/usr/bin/` folder.
+
+`git clone https://github.com/tytydraco/ChArch ChArch && chmod +x ChArch/* && cp ChArch/*arch /usr/bin/ && rm -rf ChArch`
+
+Or if you prefer to do each step manually:
+
 1) Navigate to any folder of your choice
 2) `git clone https://github.com/tytydraco/ChArch ChArch`
 3) `chmod +x ChArch/*`
-4) `sudo cp ChArch/* /usr/bin/`
+4) `sudo cp ChArch/*arch /usr/bin/`
 5) (optional) `rm -rf ChArch`
 
 ## Android
