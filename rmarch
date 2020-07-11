@@ -3,7 +3,7 @@
 
 usage() {
 	echo "Usage:"
-	echo "	unarch [-h] [-d drectory] [-n name] [-t]"
+	echo "	unarch [-h] [-d drectory] [-n name] [-t] [-a]"
 	echo ""
 	echo "Erase a rootfs instance."
 	echo ""
@@ -12,9 +12,10 @@ usage() {
 	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
 	echo "	-n: The name of the rootfs instance to remove (default: rootfs)"
 	echo "	-t: Remove the rootfs tarball if it exists"
+	echo "	-a: Perform a full removal of the chroot container folder"
 }
 
-while getopts "hd:n:t" opt; do
+while getopts "hd:n:ta" opt; do
 	case $opt in
 		h)
 			usage
@@ -28,6 +29,9 @@ while getopts "hd:n:t" opt; do
 			;;
 		t)
 			RM_TARBALL=1
+			;;
+		a)
+			RM_CONTAINER=1
 			;;
 		?)
 			usage
@@ -86,6 +90,19 @@ fi
 # Handle tarball removal
 [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]] &&
 	rm "$CHROOT_DIR/rootfs.tar.gz"
+
+# Handle contailer removal
+if [[ "$RM_CONTAINER" -eq 1 ]]
+then
+	if [[ -z `find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type d` ]]
+	then
+		rm -rf "$CHROOT_DIR"
+		exit 0
+	else
+		echo "[!] Container $CHROOT_DIR contains rootfs instances. Exiting."
+		exit 1
+	fi
+fi
 
 # Check if rootfs exists
 if [[ ! -d "$ROOTFS_DIR" ]]
