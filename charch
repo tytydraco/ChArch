@@ -80,6 +80,7 @@ _ENV=(
 	PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 	HOME="/root"
 	SHELL="/bin/bash"
+	TERM="xterm-256color"
 )
 
 # Check for required dependencies
