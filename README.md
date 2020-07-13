@@ -1,4 +1,5 @@
-# ChArch
+# ![ChArch](https://imgur.com/download/Spf3agt)
+
 A set of scripts to manage chroot containers on Linux.
 
 # Features
