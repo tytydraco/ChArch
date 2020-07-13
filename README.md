@@ -23,5 +23,4 @@ If no `-u` option is given to `charch` for these architecures, ChArch will choos
 Head over to the [Wiki](https://github.com/tytydraco/ChArch/wiki) to learn how to get started with ChArch.
 
 # Credits
-- [topjohnwu](https://github.com/topjohnwu): Magisk Module tutorial for Android devices
 - [baalajimaestro](https://github.com/baalajimaestro): Android bug testing and suggestions
