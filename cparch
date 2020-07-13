@@ -90,4 +90,4 @@ unarch -d "$CHROOT_DIR" -n "$1"
 [[ $? -ne 0 ]] && exit 1
 
 # Clone
-cp -Rp "$CHROOT_DIR/$1" "$CHROOT_DIR/$2"
+cp -Ra "$CHROOT_DIR/$1" "$CHROOT_DIR/$2"
