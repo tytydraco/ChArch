@@ -2,13 +2,12 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo -n "Usage:
-  `basename $0` [-h] [-d directory] [-n name]
+	echo -n "Usage: `basename $0` [OPTIONS]
 
 Options:
-  -h: Show usage
-  -d: Specify a chroot container directory (default: /data/local/chroot/)
-  -n: The name of the rootfs instance to unmount (default: rootfs)
+  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -n NAME		The name of the rootfs instance to unmount (default: rootfs)
+  -h			Show usage
 "
 }
 

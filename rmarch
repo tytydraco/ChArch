@@ -2,15 +2,14 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo -n "Usage:
-  `basename $0` [-h] [-d directory] [-n name] [-t] [-a]
+	echo -n "Usage: `basename $0` [OPTIONS]
 
 Options:
-  -h: Show usage
-  -d: Specify a chroot container directory (default: /data/local/chroot/)
-  -n: The name of the rootfs instance to remove (default: rootfs)
-  -t: Remove the rootfs tarball if it exists
-  -a: Perform a full removal of the chroot container folder
+  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -n NAME		The name of the rootfs instance to remove (default: rootfs)
+  -t			Remove the rootfs tarball if it exists
+  -a			Perform a full removal of the chroot container folder
+  -h			Show usage
 "
 }
 

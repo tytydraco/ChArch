@@ -2,13 +2,12 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo -n "Usage:
-  `basename $0` [-h] [-d directory]
+	echo -n "Usage: `basename $0` [OPTIONS]
 
 Options:
-  -h: Show usage
-  -d: Specify a chroot container directory (default: /data/local/chroot/)
-  -t: List existing rootfs tarballs
+  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -t			List any existing rootfs tarballs
+  -h			Show usage
 "
 }
 

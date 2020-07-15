@@ -2,18 +2,17 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo -n "Usage:
-  `basename $0` [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-U] [-c command]
+	echo -n "Usage: `basename $0` [OPTIONS]
 
 Options:
-  -h: Show usage
-  -d: Specify a chroot container directory (default: /data/local/chroot/)
-  -u: Specify a URL to fetch a rootfs tarball from
-  -f: Force a tarball refetch even if it already exists
-  -n: The name of the rootfs instance to create or enter (default: rootfs)
-  -i: Create a fresh /dev mount in the rootfs instance instead of binding it
-  -U: Unmount the rootfs instance automatically after exiting
-  -c: Command to execute inside the rootfs instance (default: /bin/bash -l)
+  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -n NAME		The name of the rootfs instance to create or enter (default: rootfs)
+  -u URL		Specify a URL to fetch a rootfs tarball from (default: ARM Arch Linux)
+  -c COMMAND		Command to execute inside the rootfs instance (default: /bin/bash -l)
+  -f			Force a tarball refetch even if it already exists
+  -i			Create a fresh /dev mount in the rootfs instance instead of binding it
+  -U			Unmount the rootfs instance automatically after exiting
+  -h			Show usage
 "
 }
 
