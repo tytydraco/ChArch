@@ -156,7 +156,7 @@ setup_rootfs() {
 	fi
 }
 
-_mount() {
+safe_mount() {
 	local type="$1"
 	local name="$2"
 
@@ -177,7 +177,7 @@ _mount() {
 	fi
 }
 
-_bind() {
+safe_bind() {
 	local name="$1"
 
 	# Create the mount point if it is missing
@@ -211,17 +211,17 @@ setup_mounts() {
 	if [[ "$ISOLATED" -eq 1 ]]
 	then
 		# Create a fresh dev mount without host hardware access
-		_mount tmpfs dev
+		safe_mount tmpfs dev
 	else
 		# Bind dev for hardware device access
-		_bind dev dev
+		safe_bind dev dev
 	fi
 
 	# Create fresh mounts for these
-	_mount devpts dev/pts
-	_mount proc proc
-	_mount sysfs sys
-	_mount tmpfs tmp
+	safe_mount devpts dev/pts
+	safe_mount proc proc
+	safe_mount sysfs sys
+	safe_mount tmpfs tmp
 
 	# Remount data partition with suid to allow sudo to function
 	mount -o remount,suid,exec `find_mountpoint "$CHROOT_DIR"`
