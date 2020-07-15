@@ -2,15 +2,13 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo "Usage:"
-	echo "	cparch [-d directory] <original-name> <new-name>"
-	echo ""
-	echo "Clone a rootfs and assign a new name within the same chroot container folder."
-	echo "The cloning process may take a while. Please be patient."
-	echo ""
-	echo "Options:"
-	echo "	-h: Show usage"
-	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
+	echo -n "Usage:
+  `basename $0` [-d directory] <original-name> <new-name>
+
+Options:
+  -h: Show usage
+  -d: Specify a chroot container directory (default: /data/local/chroot/)
+"
 }
 
 while getopts "hd::" opt; do

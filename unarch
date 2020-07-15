@@ -2,15 +2,14 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo "Usage:"
-	echo "	unarch [-h] [-d directory] [-n name]"
-	echo ""
-	echo "Unmount a rootfs instance."
-	echo ""
-	echo "Options:"
-	echo "	-h: Show usage"
-	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
-	echo "	-n: The name of the rootfs instance to unmount (default: rootfs)"
+	echo -n "Usage:
+  `basename $0` [-h] [-d directory] [-n name]
+
+Options:
+  -h: Show usage
+  -d: Specify a chroot container directory (default: /data/local/chroot/)
+  -n: The name of the rootfs instance to unmount (default: rootfs)
+"
 }
 
 while getopts "hd:n:" opt; do

@@ -2,17 +2,16 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo "Usage:"
-	echo "	unarch [-h] [-d drectory] [-n name] [-t] [-a]"
-	echo ""
-	echo "Erase a rootfs instance."
-	echo ""
-	echo "Options:"
-	echo "	-h: Show usage"
-	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
-	echo "	-n: The name of the rootfs instance to remove (default: rootfs)"
-	echo "	-t: Remove the rootfs tarball if it exists"
-	echo "	-a: Perform a full removal of the chroot container folder"
+	echo -n "Usage:
+  `basename $0` [-h] [-d drectory] [-n name] [-t] [-a]
+
+Options:
+  -h: Show usage
+  -d: Specify a chroot container directory (default: /data/local/chroot/)
+  -n: The name of the rootfs instance to remove (default: rootfs)
+  -t: Remove the rootfs tarball if it exists
+  -a: Perform a full removal of the chroot container folder
+"
 }
 
 while getopts "hd:n:ta" opt; do

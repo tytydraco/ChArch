@@ -2,20 +2,19 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo "Usage:"
-	echo "	charch [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-U] [-c command]"
-	echo ""
-	echo "Create a rootfs instance or enter an existing one."
-	echo ""
-	echo "Options:"
-	echo "	-h: Show usage"
-	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
-	echo "	-u: Specify a URL to fetch a rootfs tarball from"
-	echo "	-f: Force a tarball refetch even if it already exists"
-	echo "	-n: The name of the rootfs instance to create or enter (default: rootfs)"
-	echo "	-i: Create a fresh /dev mount in the rootfs instance instead of binding it"
-	echo "	-U: Unmount the rootfs instance automatically after exiting"
-	echo "	-c: Command to execute inside the rootfs instance (default: /bin/bash -l)"
+	echo -n "Usage:
+  `basename $0` [-h] [-d directory] [-u url] [-f] [-n name] [-i] [-U] [-c command]
+
+Options:
+  -h: Show usage
+  -d: Specify a chroot container directory (default: /data/local/chroot/)
+  -u: Specify a URL to fetch a rootfs tarball from
+  -f: Force a tarball refetch even if it already exists
+  -n: The name of the rootfs instance to create or enter (default: rootfs)
+  -i: Create a fresh /dev mount in the rootfs instance instead of binding it
+  -U: Unmount the rootfs instance automatically after exiting
+  -c: Command to execute inside the rootfs instance (default: /bin/bash -l)
+"
 }
 
 while getopts "hd:u:fn:iUc:" opt; do

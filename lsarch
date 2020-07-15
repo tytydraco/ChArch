@@ -2,15 +2,14 @@
 # Written by Draco (tytydraco) @ GitHub
 
 usage() {
-	echo "Usage:"
-	echo "	lsarch [-h] [-d directory]"
-	echo ""
-	echo "List all rootfs instances in the chroot container."
-	echo ""
-	echo "Options:"
-	echo "	-h: Show usage"
-	echo "	-d: Specify a chroot container directory (default: /data/local/chroot/)"
-	echo "	-t: List existing rootfs tarballs"
+	echo -n "Usage:
+  `basename $0` [-h] [-d directory]
+
+Options:
+  -h: Show usage
+  -d: Specify a chroot container directory (default: /data/local/chroot/)
+  -t: List existing rootfs tarballs
+"
 }
 
 while getopts "hd:t" opt; do
