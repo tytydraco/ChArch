@@ -52,7 +52,7 @@ for dep in id find
 do
 	if ! command -v "$dep" &> /dev/null
 	then
-		echo "[!] Missing $dep. Exiting."
+		echo "[!] Unable to locate dependency $dep. Exiting."
 		exit 1
 	fi
 done

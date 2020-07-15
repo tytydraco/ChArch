@@ -48,7 +48,7 @@ for dep in id unarch cp
 do
 	if ! command -v "$dep" &> /dev/null
 	then
-		echo "[!] Missing $dep. Exiting."
+		echo "[!] Unable to locate dependency $dep. Exiting."
 		exit 1
 	fi
 done

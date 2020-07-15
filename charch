@@ -86,7 +86,7 @@ for dep in id uname mount env mountpoint chroot tar mkdir awk grep rm sed find w
 do
 	if ! command -v "$dep" &> /dev/null
 	then
-		echo "[!] Missing $dep. Exiting."
+		echo "[!] Unable to locate dependency $dep. Exiting."
 		exit 1
 	fi
 done
