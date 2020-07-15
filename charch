@@ -197,6 +197,16 @@ _bind() {
 	fi
 }
 
+find_mountpoint() {
+        local path=`readlink -f "$1"`
+        until mountpoint -q "$path" &>/dev/null
+        do
+                path=${path%/*}
+                path=${path:-/}
+        done
+        echo "$path"
+}
+
 setup_mounts() {
 	if [[ "$ISOLATED" -eq 1 ]]
 	then
@@ -214,8 +224,7 @@ setup_mounts() {
 	_mount tmpfs tmp
 
 	# Remount data partition with suid to allow sudo to function
-	local root_dir=`readlink -f "$CHROOT_DIR" | awk -F "/" '{print $2}'`
-	mountpoint -q "/$root_dir" && mount -o remount,suid,exec "/$root_dir"
+	mount -o remount,suid,exec `find_mountpoint "$CHROOT_DIR"`
 }
 
 _chroot() {
