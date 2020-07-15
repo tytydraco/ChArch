@@ -82,7 +82,7 @@ _ENV=(
 )
 
 # Check for required dependencies
-for dep in id uname mount env mountpoint chroot readlink tar mkdir awk grep rm sed find wc curl unarch
+for dep in awk chroot curl env find grep id mkdir mount mountpoint readlink rm sed tar uname unarch wc
 do
 	if ! command -v "$dep" &> /dev/null
 	then

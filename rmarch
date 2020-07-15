@@ -62,7 +62,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in unarch rm id
+for dep in id rm unarch
 do
 	if ! command -v "$dep" &> /dev/null
 	then

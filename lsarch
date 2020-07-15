@@ -48,7 +48,7 @@ fi
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in id find
+for dep in find id
 do
 	if ! command -v "$dep" &> /dev/null
 	then

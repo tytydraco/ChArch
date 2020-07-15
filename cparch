@@ -44,7 +44,7 @@ fi
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in id unarch cp
+for dep in cp id unarch
 do
 	if ! command -v "$dep" &> /dev/null
 	then
