@@ -74,7 +74,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Environmental variables for the chroot
-_ENV=(
+ENV=(
 	PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 	HOME="/root"
 	SHELL="/bin/bash"
@@ -210,7 +210,7 @@ setup_mounts() {
 
 _chroot() {
 	local chroot_path=`which chroot`
-	env -i "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
+	env -i "${ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
 }
 
 post_install() {
