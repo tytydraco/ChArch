@@ -24,12 +24,8 @@ Options:
 "
 }
 
-while getopts "hd:n:ta" opt; do
+while getopts "d:n:tah" opt; do
 	case $opt in
-		h)
-			usage
-			exit 0
-			;;
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
@@ -41,6 +37,10 @@ while getopts "hd:n:ta" opt; do
 			;;
 		a)
 			RM_CONTAINER=1
+			;;
+		h)
+			usage
+			exit 0
 			;;
 		?)
 			usage

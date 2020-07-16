@@ -18,14 +18,14 @@ Options:
 "
 }
 
-while getopts "hd::" opt; do
+while getopts "d:h" opt; do
 	case $opt in
+		d)
+			CHROOT_DIR="$OPTARG"
+			;;
 		h)
 			usage
 			exit 0
-			;;
-		d)
-			CHROOT_DIR="$OPTARG"
 			;;
 		?)
 			usage

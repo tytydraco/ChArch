@@ -27,24 +27,23 @@ Options:
 "
 }
 
-while getopts "hd:u:fn:iUc:" opt; do
+while getopts "d:n:u:c:fiUh" opt; do
 	case $opt in
-		h)
-			usage
-			exit 0
-			;;
 		d)
 			CHROOT_DIR="$OPTARG"
+			;;
+		n)
+			ROOTFS="$OPTARG"
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
 			FORCE_FETCH=1
 			;;
+		c)
+			COMMAND="$OPTARG"
+			;;
 		f)
 			FORCE_FETCH=1
-			;;
-		n)
-			ROOTFS="$OPTARG"
 			;;
 		i)
 			ISOLATED=1
@@ -52,8 +51,9 @@ while getopts "hd:u:fn:iUc:" opt; do
 		U)
 			UNMOUNT=1
 			;;
-		c)
-			COMMAND="$OPTARG"
+		h)
+			usage
+			exit 0
 			;;
 		?)
 			usage

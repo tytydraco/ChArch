@@ -19,17 +19,17 @@ Options:
 "
 }
 
-while getopts "hd:t" opt; do
+while getopts "d:th" opt; do
 	case $opt in
-		h)
-			usage
-			exit 0
-			;;
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
 		t)
 			LIST_TARBALLS=1
+			;;
+		h)
+			usage
+			exit 0
 			;;
 		?)
 			usage
