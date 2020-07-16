@@ -100,7 +100,7 @@ fetch_rootfs() {
 	then
 		if [[ -z "$ROOTFS_URL" ]]
 		then
-			echo "[!] No default tarball URL for $ARCH. Exiting."
+			echo "[!] No rootfs tarball URL specified. Exiting."
 			exit 1
 		fi
 
