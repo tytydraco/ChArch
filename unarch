@@ -50,7 +50,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in awk grep id mount mountpoint tac umount uniq
+for dep in id mountpoint umount
 do
 	if ! command -v "$dep" &> /dev/null
 	then
