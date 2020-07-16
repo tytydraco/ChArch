@@ -56,7 +56,6 @@ then
 	exit 1
 fi
 
-
 # Usage check
 if [[ "$#" -ne 2 ]]
 then
