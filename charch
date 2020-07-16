@@ -279,7 +279,7 @@ then
 	# Extract tarball
 	setup_rootfs
 
-	# Mount host binds and Android-specific binds
+	# Mount host binds
 	setup_mounts
 
 	# Fix common chroot issues and do post-install config
