@@ -12,6 +12,9 @@ fi
 # The name of the current rootfs instance
 ROOTFS="rootfs"
 
+# Default command to execute on chroot enter
+COMMAND="/bin/bash -l"
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS]
 
@@ -206,14 +209,8 @@ setup_mounts() {
 }
 
 _chroot() {
-	# Call with full path
 	local chroot_path=`which chroot`
-
-	# Consider using the default bash login command
-	local command="$@"
-	[[ -z "$@" ]] && command="/bin/bash -l"
-
-	env -i "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $command
+	env -i "${_ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
 }
 
 post_install() {
