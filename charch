@@ -38,6 +38,7 @@ while getopts "hd:u:fn:iUc:" opt; do
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
+			FORCE_FETCH=1
 			;;
 		f)
 			FORCE_FETCH=1
@@ -108,9 +109,6 @@ then
 	then
 		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz"
 	fi
-else
-	# If manual rootfs URL, erase existing one to force fetch
-	FORCE_FETCH=1
 fi
 
 fetch_rootfs() {
