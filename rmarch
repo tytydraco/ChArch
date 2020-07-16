@@ -1,6 +1,17 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+# Path containing rootfs tarball and all rootfs instances
+if [[ -d "/home" ]]
+then
+	CHROOT_DIR="/home/chroot"
+else
+	CHROOT_DIR="/data/local/chroot"
+fi
+
+# The name of the current rootfs instance
+ROOTFS="rootfs"
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS]
 
@@ -38,21 +49,6 @@ while getopts "hd:n:ta" opt; do
   esac
 done
 shift $((OPTIND-1))
-
-# Path containing rootfs tarball and all rootfs instances
-if [[ -z "$CHROOT_DIR" ]]
-then
-	# Prefer a standard Linux directory
-	if [[ -d "/home" ]]
-	then
-		CHROOT_DIR="/home/chroot"
-	else
-		CHROOT_DIR="/data/local/chroot"
-	fi
-fi
-
-# The name of the current rootfs instance
-[[ -z "$ROOTFS" ]] && ROOTFS="rootfs"
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"

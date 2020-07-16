@@ -1,6 +1,14 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+# Path containing rootfs tarball and all rootfs instances
+if [[ -d "/home" ]]
+then
+	CHROOT_DIR="/home/chroot"
+else
+	CHROOT_DIR="/data/local/chroot"
+fi
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] <original-name> <new-name>
 
@@ -26,18 +34,6 @@ while getopts "hd::" opt; do
   esac
 done
 shift $((OPTIND-1))
-
-# Path containing rootfs tarball and all rootfs instances
-if [[ -z "$CHROOT_DIR" ]]
-then
-	# Prefer a standard Linux directory
-	if [[ -d "/home" ]]
-	then
-		CHROOT_DIR="/home/chroot"
-	else
-		CHROOT_DIR="/data/local/chroot"
-	fi
-fi
 
 # Add busybox components from Magisk
 [[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
