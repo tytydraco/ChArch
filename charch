@@ -59,7 +59,7 @@ while getopts "hd:u:fn:iUc:" opt; do
 			usage
 			exit 1
 			;;
-  esac
+	esac
 done
 shift $((OPTIND-1))
 

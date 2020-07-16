@@ -38,7 +38,7 @@ while getopts "hd:n:" opt; do
 			usage
 			exit 1
 			;;
-  esac
+	esac
 done
 shift $((OPTIND-1))
 
