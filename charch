@@ -95,22 +95,6 @@ then
 	exit 1
 fi
 
-# Identify an appropriate rootfs tarball for the given architecture
-if [[ -z "$ROOTFS_URL" ]]
-then
-	ARCH=`uname -m`
-	if [[ "$ARCH" == *"aarch64"* ]] || [[ "$ARCH" == *"armv8"* ]]
-	then
-		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
-	elif [[ "$ARCH" == *"armv5"* ]]
-	then
-		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv5-latest.tar.gz"
-	elif [[ "$ARCH" == *"armv7"* ]]
-	then
-		ROOTFS_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz"
-	fi
-fi
-
 fetch_rootfs() {
 	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
 	then
