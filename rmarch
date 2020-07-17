@@ -88,14 +88,12 @@ fi
 # Handle contailer removal
 if [[ "$RM_CONTAINER" -eq 1 ]]
 then
-	if [[ -z `find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type d` ]]
-	then
-		rm -rf "$CHROOT_DIR"
-		exit 0
-	else
-		echo "[!] Container $CHROOT_DIR contains rootfs instances. Exiting."
-		exit 1
-	fi
+	# Attempt to unmount all rootfs instances
+	unarch -d "$CHROOT_DIR" -a
+	[[ $? -ne 0 ]] && exit 1
+
+	rm -rf "$CHROOT_DIR"
+	exit 0
 fi
 
 # Check if rootfs exists
