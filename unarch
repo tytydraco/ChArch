@@ -21,17 +21,21 @@ usage() {
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
   -n NAME		The name of the rootfs instance to unmount (default: rootfs)
+  -a			Unmount all rootfs instances in the chroot container directory
   -h			Show usage
 "
 }
 
-while getopts "d:n:h" opt; do
+while getopts "d:n:ah" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
 		n)
 			ROOTFS="$OPTARG"
+			;;
+		a)
+			UNMOUNT_ALL=1
 			;;
 		h)
 			usage
@@ -53,7 +57,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in awk id mount seq umount
+for dep in awk id lsarch mount seq umount
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -92,26 +96,34 @@ then
 	done
 fi
 
-umount_all() {
-	local ret=0
-	for path in `mount | awk '{print $3}' | grep "^$ROOTFS_DIR"`
+unmount_rootfs() {
+	for i in `seq $RETRY_CNT`
 	do
-		umount -f "$path" &> /dev/null
+		local ret=0
+		for path in `mount | awk '{print $3}' | grep "^$1"`
+		do
+			umount -f "$path" &> /dev/null
 
-		# Fail check
-		[[ $? -ne 0 ]] && ret=1
+			# Fail check
+			[[ $? -ne 0 ]] && ret=1
+		done
+
+		# Return early if we suceeded
+		[[ "$ret" -eq 0 ]] && return 0
 	done
 
-	echo "$ret"
+	# If we made it this far, we failed one or more unmounts
+	echo "[!] Failed to unmount $1. Exiting."
+	exit 1
 }
 
-# Unmount all rootfs filesystems
-for i in `seq $RETRY_CNT`
-do
-	# Exit early if we succeeded
-	[[ `umount_all` -eq 0 ]] && exit 0
-done
-
-# If we made it this far, we failed one or more unmounts
-echo "[!] Failed to unmount one or more filesystems. Exiting."
-exit 1
+# Unmount the rootfs filesystems
+if [[ "$UNMOUNT_ALL" -eq 1 ]]
+then
+	for rootfs in `lsarch -d "$CHROOT_DIR"`
+	do
+		unmount_rootfs "$rootfs"
+	done
+else
+	unmount_rootfs "$ROOTFS_DIR"
+fi
