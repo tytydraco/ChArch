@@ -73,7 +73,7 @@ fi
 # Check for existing destination rootfs
 if [[ -d "$CHROOT_DIR/$2" ]]
 then
-	echo "[!] Rootfs with name $2 already exists. Exiting."
+	echo "[!] Rootfs instance with name $2 already exists. Exiting."
 	exit 1
 fi
 
