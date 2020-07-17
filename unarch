@@ -73,13 +73,6 @@ then
 	exit 1
 fi
 
-# Check if rootfs exists
-if [[ ! -d "$ROOTFS_DIR" ]]
-then
-	echo "[!] No instance at $ROOTFS_DIR. Exiting."
-	exit 1
-fi
-
 # Check if chroot container exists
 if [ ! -d "$CHROOT_DIR" ]
 then
@@ -87,18 +80,19 @@ then
 	exit 1
 fi
 
-# Check for optional lsof dependency to automatically kill processes
-if command -v lsof &> /dev/null
-then
-	for pid in `lsof -t "$ROOTFS_DIR"`
-	do
-		kill "$pid"
-	done
-fi
-
 unmount_rootfs() {
 	for i in `seq $RETRY_CNT`
 	do
+		# Check for optional lsof dependency to automatically kill processes
+		if command -v lsof &> /dev/null
+		then
+			for pid in `lsof -t "$1"`
+			do
+				kill "$pid"
+			done
+		fi
+
+		# Do unmount now
 		local ret=0
 		for path in `mount | awk '{print $3}' | grep "^$1"`
 		do
@@ -125,5 +119,12 @@ then
 		unmount_rootfs "$rootfs"
 	done
 else
+	# Check if rootfs exists
+	if [[ ! -d "$ROOTFS_DIR" ]]
+	then
+		echo "[!] No instance at $ROOTFS_DIR. Exiting."
+		exit 1
+	fi
+
 	unmount_rootfs "$ROOTFS_DIR"
 fi
