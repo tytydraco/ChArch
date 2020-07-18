@@ -184,6 +184,9 @@ find_mountpoint() {
         do
                 path=${path%/*}
                 path=${path:-/}
+
+		# Break if we reach the end of the filesystem
+		[[ "$path" == "/" ]] && ! mountpoint -q "/" && break
         done
         echo "$path"
 }
