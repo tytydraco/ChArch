@@ -94,7 +94,7 @@ fi
 
 umount_all() {
 	local ret=0
-	for path in `mount | awk '{print $3}' | grep "$ROOTFS_DIR"`
+	for path in `mount | awk '{print $3}' | grep "^$ROOTFS_DIR"`
 	do
 		umount -f "$path" &> /dev/null
 
