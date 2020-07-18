@@ -12,6 +12,9 @@ fi
 # The name of the current rootfs instance
 ROOTFS="rootfs"
 
+# Retry count for unmount before giving up
+RETRY_CNT=3
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS]
 
@@ -50,7 +53,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in id mountpoint umount
+for dep in awk id mount seq umount
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -89,27 +92,26 @@ then
 	done
 fi
 
-# Unmount host binds
-_umount() {
-	local name="$1"
-
-	# Unmount if not already mounted
-	if mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
-	then
-		umount -f "$ROOTFS_DIR/$name" &> /dev/null
+umount_all() {
+	local ret=0
+	for path in `mount | awk '{print $3}' | grep "$ROOTFS_DIR"`
+	do
+		umount -f "$path" &> /dev/null
 
 		# Fail check
-		if [[ $? -ne 0 ]]
-		then
-			echo "[!] Failed to unmount $name. Try rebooting. Exiting."
-			exit 1
-		fi
-	fi
+		[[ $? -ne 0 ]] && ret=1
+	done
+
+	echo "$ret"
 }
 
-# Unmount guest filesystems
-_umount dev/pts
-_umount dev
-_umount proc
-_umount sys
-_umount tmp
+# Unmount all rootfs filesystems
+for i in `seq $RETRY_CNT`
+do
+	# Exit early if we succeeded
+	[[ `umount_all` -eq 0 ]] && exit 0
+done
+
+# If we made it this far, we failed one or more unmounts
+echo "[!] Failed to unmount one or more filesystems. Exiting."
+exit 1
