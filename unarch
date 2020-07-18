@@ -108,7 +108,7 @@ unmount_rootfs() {
 	done
 
 	# If we made it this far, we failed one or more unmounts
-	echo "[!] Failed to unmount $1. Exiting."
+	echo "[!] Failed to unmount $fullpath. Exiting."
 	exit 1
 }
 
