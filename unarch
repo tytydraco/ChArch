@@ -57,7 +57,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in awk id lsarch mount seq umount
+for dep in awk id lsarch mount readlink seq umount
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -94,7 +94,8 @@ unmount_rootfs() {
 
 		# Do unmount now
 		local ret=0
-		for path in `mount | awk '{print $3}' | grep "^$1"`
+		local fullpath=`readlink -f "$1"`
+		for path in `mount | awk '{print $3}' | grep "^$fullpath"`
 		do
 			umount -f "$path" &> /dev/null
 
