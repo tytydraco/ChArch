@@ -27,7 +27,7 @@ Options:
 "
 }
 
-while getopts "d:ah" opt; do
+while getopts ":d:ah" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
@@ -39,7 +39,7 @@ while getopts "d:ah" opt; do
 			usage
 			exit 0
 			;;
-		?)
+		*)
 			usage
 			exit 1
 			;;
