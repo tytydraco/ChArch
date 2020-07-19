@@ -216,7 +216,8 @@ setup_mounts() {
 	safe_mount tmpfs tmp
 
 	# Remount data partition with suid to allow sudo to function
-	mount -o remount,suid,exec `find_mountpoint "$CHROOT_DIR"`
+	local root_mount=`find_mountpoint "$CHROOT_DIR"`
+	mountpoint -q "$root_mount" &> /dev/null && mount -o remount,suid,exec "$root_mount"
 }
 
 _chroot() {
