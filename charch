@@ -90,7 +90,7 @@ ENV=(
 )
 
 # Check for required dependencies
-for dep in chroot curl env find id mkdir mount mountpoint readlink rm sed tar unarch wc which
+for dep in chroot curl env find id mkdir mount mountpoint readlink rm sed tar unarch wc
 do
 	if ! command -v "$dep" &> /dev/null
 	then
@@ -221,8 +221,7 @@ setup_mounts() {
 }
 
 _chroot() {
-	local chroot_path=`which chroot`
-	env -i "${ENV[@]}" "$chroot_path" "$ROOTFS_DIR" $@
+	env -i "${ENV[@]}" chroot "$ROOTFS_DIR" $@
 }
 
 post_install() {
