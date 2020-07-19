@@ -1,6 +1,11 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/home" ]]
 then
@@ -32,11 +37,7 @@ while getopts "d:n:tah" opt; do
 		n)
 			ROOTFS="$OPTARG"
 
-			if [[ "$ROOTFS" == *[/.]* ]]
-			then
-				echo "[!] Rootfs name contains illegal characters. Exiting."
-				exit 1
-			fi
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		t)
 			RM_TARBALL=1
@@ -66,26 +67,14 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Check for required dependencies
 for dep in id readlink rm unarch
 do
-	if ! command -v "$dep" &> /dev/null
-	then
-		echo "[!] Unable to locate dependency $dep. Exiting."
-		exit 1
-	fi
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-if [[ `id -u` -ne 0 ]]
-then
-	echo "[!] No root permissions. Exiting."
-	exit 1
-fi
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Check if chroot container exists
-if [[ ! -d "$CHROOT_DIR" ]]
-then
-	echo "[!] No container at $CHROOT_DIR. Exiting."
-	exit 1
-fi
+[[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Handle tarball removal
 if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]]
@@ -106,11 +95,7 @@ then
 fi
 
 # Check if rootfs exists
-if [[ ! -d "$ROOTFS_DIR" ]]
-then
-	echo "[!] No rootfs instance at $ROOTFS_DIR. Exiting."
-	exit 1
-fi
+[[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
 # Try to unmount rootfs mounts
 unarch -d "$CHROOT_DIR" -n "$ROOTFS"

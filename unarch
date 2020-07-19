@@ -1,6 +1,11 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
 # Path containing rootfs tarball and rootfs instances
 if [[ -d "/home" ]]
 then
@@ -34,11 +39,7 @@ while getopts "d:n:ah" opt; do
 		n)
 			ROOTFS="$OPTARG"
 
-			if [[ "$ROOTFS" == *[/.]* ]]
-			then
-				echo "[!] Rootfs name contains illegal characters. Exiting."
-				exit 1
-			fi
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		a)
 			UNMOUNT_ALL=1
@@ -65,26 +66,14 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Check for required dependencies
 for dep in awk grep id lsarch mount readlink seq umount
 do
-	if ! command -v "$dep" &> /dev/null
-	then
-		echo "[!] Unable to locate dependency $dep. Exiting."
-		exit 1
-	fi
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-if [[ `id -u` -ne 0 ]]
-then
-	echo "[!] No root permissions. Exiting."
-	exit 1
-fi
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Check if chroot container exists
-if [ ! -d "$CHROOT_DIR" ]
-then
-	echo "[!] No container at $CHROOT_DIR. Exiting."
-	exit 1
-fi
+[[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 unmount_rootfs() {
 	for i in `seq $RETRY_CNT`
@@ -114,8 +103,7 @@ unmount_rootfs() {
 	done
 
 	# If we made it this far, we failed one or more unmounts
-	echo "[!] Failed to unmount $fullpath. Exiting."
-	exit 1
+	err "Failed to unmount $fullpath. Exiting."
 }
 
 # Unmount the rootfs filesystems
@@ -127,11 +115,7 @@ then
 	done
 else
 	# Check if rootfs exists
-	if [[ ! -d "$ROOTFS_DIR" ]]
-	then
-		echo "[!] No rootfs instance at $ROOTFS_DIR. Exiting."
-		exit 1
-	fi
+	[[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
 	unmount_rootfs "$ROOTFS_DIR"
 fi

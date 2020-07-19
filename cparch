@@ -1,6 +1,11 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/home" ]]
 then
@@ -35,11 +40,7 @@ while getopts "d:h" opt; do
 done
 shift $((OPTIND-1))
 
-if [[ "$1 $2" == *[/.]* ]]
-then
-	echo "[!] Rootfs name contains illegal characters. Exiting."
-	exit 1
-fi
+[[ "$1 $2" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 
 # Add busybox components from Magisk
 [[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
@@ -48,19 +49,11 @@ fi
 # Check for required dependencies
 for dep in cp id unarch
 do
-	if ! command -v "$dep" &> /dev/null
-	then
-		echo "[!] Unable to locate dependency $dep. Exiting."
-		exit 1
-	fi
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-if [[ `id -u` -ne 0 ]]
-then
-	echo "[!] No root permissions. Exiting."
-	exit 1
-fi
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Usage check
 if [[ "$#" -ne 2 ]]
@@ -70,18 +63,10 @@ then
 fi
 
 # Check if chroot container exists
-if [[ ! -d "$CHROOT_DIR" ]]
-then
-	echo "[!] No container at $CHROOT_DIR. Exiting."
-	exit 1
-fi
+[[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Check for existing destination rootfs
-if [[ -d "$CHROOT_DIR/$2" ]]
-then
-	echo "[!] Rootfs instance with name $2 already exists. Exiting."
-	exit 1
-fi
+[[ -d "$CHROOT_DIR/$2" ]] && err "Rootfs instance with name $2 already exists. Exiting."
 
 # Unmount and exit on fail
 unarch -d "$CHROOT_DIR" -n "$1"

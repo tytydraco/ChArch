@@ -1,6 +1,11 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/home" ]]
 then
@@ -39,11 +44,7 @@ while getopts "d:n:u:C:cfiUh" opt; do
 		n)
 			ROOTFS="$OPTARG"
 
-			if [[ "$ROOTFS" == *[/.]* ]]
-			then
-				echo "[!] Rootfs name contains illegal characters. Exiting."
-				exit 1
-			fi
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
@@ -92,36 +93,20 @@ ENV=(
 # Check for required dependencies
 for dep in chroot curl env find id mkdir mount mountpoint readlink rm sed tar unarch wc
 do
-	if ! command -v "$dep" &> /dev/null
-	then
-		echo "[!] Unable to locate dependency $dep. Exiting."
-		exit 1
-	fi
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-if [[ `id -u` -ne 0 ]]
-then
-	echo "[!] No root permissions. Exiting."
-	exit 1
-fi
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 fetch_rootfs() {
 	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
 	then
-		if [[ -z "$ROOTFS_URL" ]]
-		then
-			echo "[!] No rootfs tarball URL specified. Exiting."
-			exit 1
-		fi
+		[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
 		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" "$ROOTFS_URL"
 
-		if [[ $? -ne 0 ]]
-		then
-			echo "[!] Failed to fetch rootfs tarball. Exiting."
-			exit 1
-		fi
+		[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 	fi
 }
 
@@ -129,11 +114,7 @@ setup_rootfs() {
 	mkdir -p "$ROOTFS_DIR"
 	tar xf "$CHROOT_DIR/rootfs.tar.gz" -C "$ROOTFS_DIR" &> /dev/null
 
-	if [[ $? -ne 0 ]]
-	then
-		echo "[!] Failed to extract rootfs tarball. Exiting."
-		exit 1
-	fi
+	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
 
 	# Check for nested rootfs directory
 	local dircount=`ls "$ROOTFS_DIR" | wc -w`
@@ -158,11 +139,7 @@ safe_mount() {
 		mount -t "$type" "$type" "$ROOTFS_DIR/$name"
 
 		# Fail check
-		if [[ $? -ne 0 ]]
-		then
-			echo "[!] Failed to mount $type. Exiting."
-			exit 1
-		fi
+		[[ $? -ne 0 ]] && err "Failed to mount $type. Exiting."
 	fi
 }
 
@@ -178,11 +155,7 @@ safe_bind() {
 		mount --bind "/$name" "$ROOTFS_DIR/$name"
 
 		# Fail check
-		if [[ $? -ne 0 ]]
-		then
-			echo "[!] Failed to mount $name. Exiting."
-			exit 1
-		fi
+		[[ $? -ne 0 ]] && err "Failed to mount $name. Exiting."
 	fi
 }
 
@@ -256,11 +229,7 @@ post_install() {
 # Create a new rootfs instance
 if [[ "$CREATE" -eq 1 ]]
 then
-	if [[ -d "$ROOTFS_DIR" ]]
-	then
-		echo "[!] Rootfs instance already exists at $ROOTFS_DIR. Exiting."
-		exit 1
-	fi
+	[[ -d "$ROOTFS_DIR" ]] && err "Rootfs instance already exists at $ROOTFS_DIR. Exiting."
 
 	# Create initial chroot home
 	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
@@ -277,11 +246,7 @@ then
 	# Fix common chroot issues and do post-install config
 	post_install &> /dev/null
 else
-	if [[ ! -d "$ROOTFS_DIR" ]]
-	then
-		echo "[!] No rootfs instance at $ROOTFS_DIR. Exiting."
-		exit 1
-	fi
+	[[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
 	# Mount host binds
 	setup_mounts

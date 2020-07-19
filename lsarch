@@ -1,6 +1,11 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/home" ]]
 then
@@ -46,26 +51,14 @@ shift $((OPTIND-1))
 # Check for required dependencies
 for dep in find id
 do
-	if ! command -v "$dep" &> /dev/null
-	then
-		echo "[!] Unable to locate dependency $dep. Exiting."
-		exit 1
-	fi
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-if [[ `id -u` -ne 0 ]]
-then
-	echo "[!] No root permissions. Exiting."
-	exit 1
-fi
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Check if chroot container exists
-if [ ! -d "$CHROOT_DIR" ]
-then
-	echo "[!] No container at $CHROOT_DIR. Exiting."
-	exit 1
-fi
+[[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Display paths to available rootfs instances
 if [[ "$LIST_TARBALLS" -eq 1 ]]
