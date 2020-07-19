@@ -21,9 +21,9 @@ usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
 Options:
-  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
-  -u URL		Specify a URL to fetch a rootfs tarball from (default: ARM Arch Linux)
-  -C COMMAND		Command to execute inside the rootfs instance (default: /bin/bash -l)
+  -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
+  -u URL		Specify a URL to fetch a rootfs tarball from
+  -C COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
   -c			Create a new rootfs instance
   -f			Force a tarball refetch even if it already exists
   -i			Create a fresh /dev mount in the rootfs instance instead of binding it

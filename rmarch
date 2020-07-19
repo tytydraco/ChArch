@@ -18,7 +18,7 @@ usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
 Options:
-  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -t			Remove the rootfs tarball if it exists
   -a			Perform a full removal of the chroot container folder
   -h			Show usage

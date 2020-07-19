@@ -15,10 +15,10 @@ else
 fi
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] <original-name> <new-name>
+	echo -n "Usage: `basename $0` [OPTIONS] <OLD NAME> <NEW NAME>
 
 Options:
-  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -h			Show usage
 "
 }

@@ -18,7 +18,7 @@ usage() {
 	echo -n "Usage: `basename $0` [OPTIONS]
 
 Options:
-  -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
+  -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -t			List any existing rootfs tarballs
   -h			Show usage
 "
