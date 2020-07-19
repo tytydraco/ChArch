@@ -38,6 +38,12 @@ while getopts "d:n:u:C:cfiUh" opt; do
 			;;
 		n)
 			ROOTFS="$OPTARG"
+
+			if [[ "$ROOTFS" == *[/.]* ]]
+			then
+				echo "[!] Rootfs name contains illegal characters. Exiting."
+				exit 1
+			fi
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"

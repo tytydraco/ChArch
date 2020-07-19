@@ -33,6 +33,12 @@ while getopts "d:n:ah" opt; do
 			;;
 		n)
 			ROOTFS="$OPTARG"
+
+			if [[ "$ROOTFS" == *[/.]* ]]
+			then
+				echo "[!] Rootfs name contains illegal characters. Exiting."
+				exit 1
+			fi
 			;;
 		a)
 			UNMOUNT_ALL=1
