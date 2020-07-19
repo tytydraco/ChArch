@@ -22,7 +22,8 @@ Options:
   -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
   -n NAME		The name of the rootfs instance to create or enter (default: rootfs)
   -u URL		Specify a URL to fetch a rootfs tarball from (default: ARM Arch Linux)
-  -c COMMAND		Command to execute inside the rootfs instance (default: /bin/bash -l)
+  -C COMMAND		Command to execute inside the rootfs instance (default: /bin/bash -l)
+  -c			Create a new rootfs instance
   -f			Force a tarball refetch even if it already exists
   -i			Create a fresh /dev mount in the rootfs instance instead of binding it
   -U			Unmount the rootfs instance automatically after exiting
@@ -30,7 +31,7 @@ Options:
 "
 }
 
-while getopts "d:n:u:c:fiUh" opt; do
+while getopts "d:n:u:C:cfiUh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
@@ -42,8 +43,11 @@ while getopts "d:n:u:c:fiUh" opt; do
 			ROOTFS_URL="$OPTARG"
 			FORCE_FETCH=1
 			;;
-		c)
+		C)
 			COMMAND="$OPTARG"
+			;;
+		c)
+			CREATE=1
 			;;
 		f)
 			FORCE_FETCH=1
@@ -245,12 +249,18 @@ post_install() {
 	fi
 }
 
-# Create initial chroot home
-[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
-
-# Create rootfs instance
-if [[ ! -d "$ROOTFS_DIR" ]]
+# Create a new rootfs instance
+if [[ "$CREATE" -eq 1 ]]
 then
+	if [[ -d "$ROOTFS_DIR" ]]
+	then
+		echo "[!] Rootfs instance $ROOTFS already exists. Exiting."
+		exit 1
+	fi
+
+	# Create initial chroot home
+	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
+
 	# Fetch latest rootfs tarball for architecture
 	fetch_rootfs
 
@@ -263,7 +273,13 @@ then
 	# Fix common chroot issues and do post-install config
 	post_install &> /dev/null
 else
-	# Do mounts if rootfs instance already exists
+	if [[ ! -d "$ROOTFS_DIR" ]]
+	then
+		echo "[!] Rootfs instance $ROOTFS not found. Exiting."
+		exit 1
+	fi
+
+	# Mount host binds
 	setup_mounts
 fi
 
