@@ -153,7 +153,7 @@ safe_mount() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mountpoint -q "$ROOTFS_DIR/$name"
+	if ! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
 	then
 		mount -t "$type" "$type" "$ROOTFS_DIR/$name"
 
@@ -194,7 +194,7 @@ find_mountpoint() {
                 path=${path:-/}
 
 		# Break if we reach the end of the filesystem
-		[[ "$path" == "/" ]] && ! mountpoint -q "/" && break
+		[[ "$path" == "/" ]] && ! mountpoint -q "/" &> /dev/null && break
         done
         echo "$path"
 }
