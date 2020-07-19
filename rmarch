@@ -82,8 +82,11 @@ then
 fi
 
 # Handle tarball removal
-[[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]] &&
+if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar.gz" ]]
+then
 	rm "$CHROOT_DIR/rootfs.tar.gz"
+	exit 0
+fi
 
 # Handle contailer removal
 if [[ "$RM_CONTAINER" -eq 1 ]]
