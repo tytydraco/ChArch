@@ -14,32 +14,23 @@ else
 	CHROOT_DIR="/data/local/chroot"
 fi
 
-# The name of the current rootfs instance
-ROOTFS="rootfs"
-
 # Retry count for unmount before giving up
 RETRY_CNT=3
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS]
+	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
-  -n NAME		The name of the rootfs instance to unmount (default: rootfs)
   -a			Unmount all rootfs instances in the chroot container directory
   -h			Show usage
 "
 }
 
-while getopts "d:n:ah" opt; do
+while getopts "d:ah" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
-			;;
-		n)
-			ROOTFS="$OPTARG"
-
-			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		a)
 			UNMOUNT_ALL=1
@@ -55,6 +46,15 @@ while getopts "d:n:ah" opt; do
 	esac
 done
 shift $((OPTIND-1))
+
+# The name of the current rootfs instance
+if [[ ! -z "$1" ]]
+then
+	ROOTFS="$1"
+	[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
+else
+	ROOTFS="rootfs"
+fi
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"

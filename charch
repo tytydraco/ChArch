@@ -14,18 +14,14 @@ else
 	CHROOT_DIR="/data/local/chroot"
 fi
 
-# The name of the current rootfs instance
-ROOTFS="rootfs"
-
 # Default command to execute on chroot enter
 COMMAND="/bin/bash -l"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS]
+	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
-  -n NAME		The name of the rootfs instance to create or enter (default: rootfs)
   -u URL		Specify a URL to fetch a rootfs tarball from (default: ARM Arch Linux)
   -C COMMAND		Command to execute inside the rootfs instance (default: /bin/bash -l)
   -c			Create a new rootfs instance
@@ -36,15 +32,10 @@ Options:
 "
 }
 
-while getopts "d:n:u:C:cfiUh" opt; do
+while getopts "d:u:C:cfiUh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
-			;;
-		n)
-			ROOTFS="$OPTARG"
-
-			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
@@ -76,6 +67,15 @@ while getopts "d:n:u:C:cfiUh" opt; do
 	esac
 done
 shift $((OPTIND-1))
+
+# The name of the current rootfs instance
+if [[ ! -z "$1" ]]
+then
+	ROOTFS="$1"
+	[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
+else
+	ROOTFS="rootfs"
+fi
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
@@ -256,4 +256,4 @@ fi
 _chroot "$COMMAND"
 
 # Try to unmount rootfs mounts
-[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" -n "$ROOTFS"
+[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"

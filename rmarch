@@ -14,15 +14,11 @@ else
 	CHROOT_DIR="/data/local/chroot"
 fi
 
-# The name of the current rootfs instance
-ROOTFS="rootfs"
-
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS]
+	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: /data/local/chroot/)
-  -n NAME		The name of the rootfs instance to remove (default: rootfs)
   -t			Remove the rootfs tarball if it exists
   -a			Perform a full removal of the chroot container folder
   -h			Show usage
@@ -33,11 +29,6 @@ while getopts "d:n:tah" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
-			;;
-		n)
-			ROOTFS="$OPTARG"
-
-			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		t)
 			RM_TARBALL=1
@@ -56,6 +47,15 @@ while getopts "d:n:tah" opt; do
 	esac
 done
 shift $((OPTIND-1))
+
+# The name of the current rootfs instance
+if [[ ! -z "$1" ]]
+then
+	ROOTFS="$1"
+	[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
+else
+	ROOTFS="rootfs"
+fi
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
@@ -98,7 +98,7 @@ fi
 [[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
 # Try to unmount rootfs mounts
-unarch -d "$CHROOT_DIR" -n "$ROOTFS"
+unarch -d "$CHROOT_DIR" "$ROOTFS"
 
 # If unmount failed, exit here to avoid corruption
 [[ $? -ne 0 ]] && exit 1

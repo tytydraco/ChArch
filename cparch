@@ -69,7 +69,7 @@ fi
 [[ -d "$CHROOT_DIR/$2" ]] && err "Rootfs instance with name $2 already exists. Exiting."
 
 # Unmount and exit on fail
-unarch -d "$CHROOT_DIR" -n "$1"
+unarch -d "$CHROOT_DIR" "$1"
 [[ $? -ne 0 ]] && exit 1
 
 # Clone
