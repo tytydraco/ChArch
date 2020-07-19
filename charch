@@ -86,7 +86,6 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Environmental variables for the chroot
 ENV=(
 	HOME="/root"
-	SHELL="/bin/bash"
 	TERM="xterm-256color"
 )
 
