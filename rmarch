@@ -102,7 +102,7 @@ fi
 # Check if rootfs exists
 if [[ ! -d "$ROOTFS_DIR" ]]
 then
-	echo "[!] No instance at $ROOTFS_DIR. Exiting."
+	echo "[!] No rootfs instance at $ROOTFS_DIR. Exiting."
 	exit 1
 fi
 

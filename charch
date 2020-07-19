@@ -254,7 +254,7 @@ if [[ "$CREATE" -eq 1 ]]
 then
 	if [[ -d "$ROOTFS_DIR" ]]
 	then
-		echo "[!] Rootfs instance $ROOTFS already exists. Exiting."
+		echo "[!] Rootfs instance already exists at $ROOTFS_DIR. Exiting."
 		exit 1
 	fi
 
@@ -275,7 +275,7 @@ then
 else
 	if [[ ! -d "$ROOTFS_DIR" ]]
 	then
-		echo "[!] Rootfs instance $ROOTFS not found. Exiting."
+		echo "[!] No rootfs instance at $ROOTFS_DIR. Exiting."
 		exit 1
 	fi
 
