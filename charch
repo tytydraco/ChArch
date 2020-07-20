@@ -172,12 +172,10 @@ setup_mounts() {
 		safe_mount tmpfs dev
 		safe_mount sysfs sys
 		safe_mount proc proc
-		safe_mount tmpfs run
 	else
 		safe_rbind dev
 		safe_rbind sys
 		safe_rbind proc
-		safe_rbind run
 	fi
 
 	safe_mount tmpfs tmp
