@@ -184,9 +184,11 @@ setup_mounts() {
 
 	# Create fresh mounts for these
 	safe_mount devpts dev/pts
+	safe_mount tmpfs dev/shm
 	safe_mount proc proc
 	safe_mount sysfs sys
 	safe_mount tmpfs tmp
+	safe_mount tmpfs run
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
