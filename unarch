@@ -83,7 +83,7 @@ unmount_rootfs() {
 		then
 			for pid in `lsof -t "$1"`
 			do
-				kill "$pid"
+				kill "$pid" &> /dev/null
 			done
 		fi
 
