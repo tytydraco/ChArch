@@ -98,12 +98,6 @@ unmount_rootfs() {
 			[[ $? -ne 0 ]] && ret=1
 		done
 
-		# Final rootfs unmount
-		umount -f "$1" &> /dev/null
-
-		# Fail check
-		[[ $? -ne 0 ]] && ret=1
-
 		# Return early if we suceeded
 		[[ "$ret" -eq 0 ]] && return 0
 	done
