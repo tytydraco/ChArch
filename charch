@@ -127,24 +127,21 @@ setup_rootfs() {
 }
 
 safe_mount() {
-	local type="$1"
-	local name="$2"
-
 	# Create the mount point if it is missing
-	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
+	[[ ! -d "$ROOTFS_DIR/$2" ]] && mkdir -p "$ROOTFS_DIR/$2"
 
-	# Bind if not already mounted
-	! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null && mount -t "$type" "$type" "$ROOTFS_DIR/$name"
+	# Bind if it is not already mounted
+	! mountpoint -q "$ROOTFS_DIR/$2" &> /dev/null &&
+		mount -t "$1" "$1" "$ROOTFS_DIR/$2"
 }
 
 safe_bind() {
-	local name="$1"
-
 	# Create the mount point if it is missing
-	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
+	[[ ! -d "$ROOTFS_DIR/$1" ]] && mkdir -p "$ROOTFS_DIR/$1"
 
-	# Bind if not already mounted
-	! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null && mount --bind "/$name" "$ROOTFS_DIR/$name"
+	# Bind if it exists and it is not already mounted
+	mountpoint -q "/$1" &> /dev/null && ! mountpoint -q "$ROOTFS_DIR/$1" &> /dev/null &&
+		mount --bind "/$1" "$ROOTFS_DIR/$1"
 }
 
 find_mountpoint() {
@@ -167,7 +164,7 @@ setup_mounts() {
 		safe_mount tmpfs dev
 	else
 		# Bind dev for hardware device access
-		safe_bind dev dev
+		safe_bind dev
 	fi
 
 	# Create fresh mounts for these
@@ -177,6 +174,31 @@ setup_mounts() {
 	safe_mount sysfs sys
 	safe_mount tmpfs tmp
 	safe_mount tmpfs run
+
+	# Create optional mounts
+	safe_bind sys/fs/cgroup
+	safe_bind sys/fs/cgroup/unified
+	safe_bind sys/fs/cgroup/systemd
+	safe_bind sys/fs/pstore
+	safe_bind sys/fs/bpf
+	safe_bind sys/fs/cgroup/pids
+	safe_bind sys/fs/cgroup/hugetlb
+	safe_bind sys/fs/cgroup/freezer
+	safe_bind sys/fs/cgroup/blkio
+	safe_bind sys/fs/cgroup/net_cls,net_prio
+	safe_bind sys/fs/cgroup/perf_event
+	safe_bind sys/fs/cgroup/memory
+	safe_bind sys/fs/cgroup/rdma
+	safe_bind sys/fs/cgroup/cpu,cpuacct
+	safe_bind sys/fs/cgroup/cpuset
+	safe_bind sys/fs/cgroup/devices
+	safe_bind sys/kernel/security
+	safe_bind sys/kernel/config
+	safe_bind sys/kernel/debug
+	safe_bind sys/kernel/tracing
+	safe_bind sys/firmware/efi/efivars
+	safe_bind dev/mqueue
+	safe_bind dev/hugepages
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
