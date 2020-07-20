@@ -14,9 +14,6 @@ else
 	CHROOT_DIR="/data/local/chroot"
 fi
 
-# Retry count for unmount before giving up
-RETRY_CNT=3
-
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
@@ -64,7 +61,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in awk grep id lsarch mount readlink seq umount
+for dep in awk grep id lsarch mount readlink seq sort umount
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -76,34 +73,28 @@ done
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 unmount_rootfs() {
-	for i in `seq $RETRY_CNT`
-	do
-		# Check for optional lsof dependency to automatically kill processes
-		if command -v lsof &> /dev/null
-		then
-			for pid in `lsof -t "$1"`
-			do
-				kill "$pid" &> /dev/null
-			done
-		fi
-
-		# Do sub-unmounts now
-		local ret=0
-		local fullpath=`readlink -f "$1"`
-		for path in `mount | awk '{print $3}' | grep "^$fullpath/"`
+	# Check for optional lsof dependency to automatically kill processes
+	if command -v lsof &> /dev/null
+	then
+		for pid in `lsof -t "$1"`
 		do
-			umount -f "$path" &> /dev/null
-
-			# Fail check
-			[[ $? -ne 0 ]] && ret=1
+			kill "$pid" &> /dev/null
 		done
+	fi
 
-		# Return early if we suceeded
-		[[ "$ret" -eq 0 ]] && return 0
+	# Do unmounts now
+	local ret=0
+	local fullpath=`readlink -f "$1"`
+	for path in `mount | awk '{print $3}' | grep "^$fullpath/" | sort -r`
+	do
+		umount -f "$path" &> /dev/null
+
+		# Fail check
+		[[ $? -ne 0 ]] && ret=1
 	done
 
-	# If we made it this far, we failed one or more unmounts
-	err "Failed to unmount $fullpath. Exiting."
+	# Check for failed attempts
+	[[ "$ret" -ne 0 ]] && err "Failed to unmount $fullpath. Exiting."
 }
 
 # Unmount the rootfs filesystems
