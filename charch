@@ -27,12 +27,12 @@ Options:
   -n			Create a new rootfs instance
   -f			Force a tarball refetch even if it already exists
   -i			Create a fresh /dev mount in the rootfs instance instead of binding it
-  -U			Unmount the rootfs instance automatically after exiting
+  -k			Keep host mounts after exiting the chroot
   -h			Show usage
 "
 }
 
-while getopts ":d:u:c:nfiUh" opt; do
+while getopts ":d:u:c:nfikh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
@@ -53,8 +53,8 @@ while getopts ":d:u:c:nfiUh" opt; do
 		i)
 			ISOLATED=1
 			;;
-		U)
-			UNMOUNT=1
+		k)
+			KEEP_MOUNTS=1
 			;;
 		h)
 			usage
@@ -256,4 +256,4 @@ fi
 _chroot "$COMMAND"
 
 # Try to unmount rootfs mounts
-[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
+[[ "$KEEP_MOUNTS" -eq 0 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
