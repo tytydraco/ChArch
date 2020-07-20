@@ -145,6 +145,14 @@ safe_bind() {
 	! mountpoint -q "$ROOTFS_DIR/$1" &> /dev/null && mount --bind "/$1" "$ROOTFS_DIR/$1"
 }
 
+safe_rbind() {
+	safe_bind "$1"
+	for path in `mount | awk '{print $3}' | grep "^\/$1/"`
+	do
+		safe_bind "$path"
+	done
+}
+
 find_mountpoint() {
         local path=`readlink -f "$1"`
         until mountpoint -q "$path" &>/dev/null
@@ -165,16 +173,14 @@ setup_mounts() {
 		safe_mount tmpfs dev
 	else
 		# Bind dev for hardware device access
-		safe_bind dev
+		safe_rbind dev
 	fi
 
 	# Create fresh mounts for these
-	safe_mount devpts dev/pts
-	safe_mount tmpfs dev/shm
 	safe_mount proc proc
-	safe_mount sysfs sys
 	safe_mount tmpfs tmp
-	safe_mount tmpfs run
+	safe_rbind sys
+	safe_rbind run
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
