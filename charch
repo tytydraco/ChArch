@@ -200,6 +200,7 @@ setup_mounts() {
 	safe_bind sys/firmware/efi/efivars
 	safe_bind dev/mqueue
 	safe_bind dev/hugepages
+	safe_bind proc/sys/fs/binfmt_misc
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
