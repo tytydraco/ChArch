@@ -176,32 +176,6 @@ setup_mounts() {
 	safe_mount tmpfs tmp
 	safe_mount tmpfs run
 
-	# Create optional mounts
-	safe_bind sys/fs/cgroup
-	safe_bind sys/fs/cgroup/unified
-	safe_bind sys/fs/cgroup/systemd
-	safe_bind sys/fs/pstore
-	safe_bind sys/fs/bpf
-	safe_bind sys/fs/cgroup/pids
-	safe_bind sys/fs/cgroup/hugetlb
-	safe_bind sys/fs/cgroup/freezer
-	safe_bind sys/fs/cgroup/blkio
-	safe_bind sys/fs/cgroup/net_cls,net_prio
-	safe_bind sys/fs/cgroup/perf_event
-	safe_bind sys/fs/cgroup/memory
-	safe_bind sys/fs/cgroup/rdma
-	safe_bind sys/fs/cgroup/cpu,cpuacct
-	safe_bind sys/fs/cgroup/cpuset
-	safe_bind sys/fs/cgroup/devices
-	safe_bind sys/kernel/security
-	safe_bind sys/kernel/config
-	safe_bind sys/kernel/debug
-	safe_bind sys/kernel/tracing
-	safe_bind sys/firmware/efi/efivars
-	safe_bind dev/mqueue
-	safe_bind dev/hugepages
-	safe_bind proc/sys/fs/binfmt_misc
-
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
 	mountpoint -q "$root_mount" &> /dev/null && mount -o remount,suid,exec "$root_mount"
