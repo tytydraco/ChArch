@@ -134,13 +134,7 @@ safe_mount() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
-	then
-		mount -t "$type" "$type" "$ROOTFS_DIR/$name"
-
-		# Fail check
-		[[ $? -ne 0 ]] && err "Failed to mount $type. Exiting."
-	fi
+	! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null && mount -t "$type" "$type" "$ROOTFS_DIR/$name"
 }
 
 safe_bind() {
@@ -150,13 +144,7 @@ safe_bind() {
 	[[ ! -d "$ROOTFS_DIR/$name" ]] && mkdir -p "$ROOTFS_DIR/$name"
 
 	# Bind if not already mounted
-	if ! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null
-	then
-		mount --bind "/$name" "$ROOTFS_DIR/$name"
-
-		# Fail check
-		[[ $? -ne 0 ]] && err "Failed to mount $name. Exiting."
-	fi
+	! mountpoint -q "$ROOTFS_DIR/$name" &> /dev/null && mount --bind "/$name" "$ROOTFS_DIR/$name"
 }
 
 find_mountpoint() {
