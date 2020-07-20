@@ -26,7 +26,7 @@ Options:
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
   -n			Create a new rootfs instance
   -f			Force a tarball refetch even if it already exists
-  -i			Create a fresh /dev mount in the rootfs instance instead of binding it
+  -i			Create fresh mounts instead of recursive host binds
   -k			Keep host mounts after exiting the chroot
   -h			Show usage
 "
@@ -169,18 +169,18 @@ find_mountpoint() {
 setup_mounts() {
 	if [[ "$ISOLATED" -eq 1 ]]
 	then
-		# Create a fresh dev mount without host hardware access
 		safe_mount tmpfs dev
+		safe_mount sysfs sys
+		safe_mount proc proc
+		safe_mount tmpfs run
 	else
-		# Bind dev for hardware device access
 		safe_rbind dev
+		safe_rbind sys
+		safe_rbind proc
+		safe_rbind run
 	fi
 
-	# Create fresh mounts for these
-	safe_mount proc proc
 	safe_mount tmpfs tmp
-	safe_rbind sys
-	safe_rbind run
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
