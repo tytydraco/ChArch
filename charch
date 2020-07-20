@@ -23,8 +23,8 @@ usage() {
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -u URL		Specify a URL to fetch a rootfs tarball from
-  -C COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
-  -c			Create a new rootfs instance
+  -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
+  -n			Create a new rootfs instance
   -f			Force a tarball refetch even if it already exists
   -i			Create a fresh /dev mount in the rootfs instance instead of binding it
   -U			Unmount the rootfs instance automatically after exiting
@@ -32,7 +32,7 @@ Options:
 "
 }
 
-while getopts ":d:u:C:cfiUh" opt; do
+while getopts ":d:u:c:nfiUh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
@@ -41,10 +41,10 @@ while getopts ":d:u:C:cfiUh" opt; do
 			ROOTFS_URL="$OPTARG"
 			FORCE_FETCH=1
 			;;
-		C)
+		c)
 			COMMAND="$OPTARG"
 			;;
-		c)
+		n)
 			CREATE=1
 			;;
 		f)
