@@ -83,18 +83,11 @@ unmount_rootfs() {
 	fi
 
 	# Do unmounts now
-	local ret=0
 	local fullpath=`readlink -f "$1"`
 	for path in `mount | awk '{print $3}' | grep "^$fullpath/" | sort -r`
 	do
-		umount -f "$path" &> /dev/null
-
-		# Fail check
-		[[ $? -ne 0 ]] && ret=1
+		umount -l -f "$path" &> /dev/null
 	done
-
-	# Check for failed attempts
-	[[ "$ret" -ne 0 ]] && err "Failed to unmount $fullpath. Exiting."
 }
 
 # Unmount the rootfs filesystems
