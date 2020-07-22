@@ -9,9 +9,9 @@ err() {
 # Path containing rootfs tarball and rootfs instances
 if [[ -d "/home" ]]
 then
-	CHROOT_DIR="/home/chroot"
+	CHROOT_DIR="~/charch"
 else
-	CHROOT_DIR="/data/local/chroot"
+	CHROOT_DIR="/data/local/charch"
 fi
 
 usage() {
