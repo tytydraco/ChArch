@@ -15,7 +15,7 @@ else
 fi
 
 # Default command to execute on chroot enter
-COMMAND="su -l"
+COMMAND="/bin/su -l"
 
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
