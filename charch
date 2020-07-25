@@ -7,11 +7,11 @@ err() {
 }
 
 # Path containing rootfs tarball and all rootfs instances
-if [[ -d "/home" ]]
+if [[ -d "/data" ]]
 then
-	CHROOT_DIR="~/charch"
-else
 	CHROOT_DIR="/data/local/charch"
+else
+	CHROOT_DIR="~/charch"
 fi
 
 # Default command to execute on chroot enter
