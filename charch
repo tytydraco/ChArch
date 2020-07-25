@@ -100,11 +100,11 @@ done
 [[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 fetch_rootfs() {
-	if [[ ! -f "$CHROOT_DIR/rootfs.tar.gz" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
+	if [[ ! -f "$CHROOT_DIR/rootfs" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
 	then
 		[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-		curl -# -L -o "$CHROOT_DIR/rootfs.tar.gz" "$ROOTFS_URL"
+		curl -# -L -o "$CHROOT_DIR/rootfs" "$ROOTFS_URL"
 
 		[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 	fi
@@ -112,7 +112,7 @@ fetch_rootfs() {
 
 setup_rootfs() {
 	mkdir -p "$ROOTFS_DIR"
-	tar xf "$CHROOT_DIR/rootfs.tar.gz" -C "$ROOTFS_DIR" &> /dev/null
+	tar xf "$CHROOT_DIR/rootfs" -C "$ROOTFS_DIR" &> /dev/null
 
 	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
 
