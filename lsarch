@@ -14,6 +14,9 @@ else
 	CHROOT_DIR="/data/local/charch"
 fi
 
+# Default results of find command
+FIND_TYPE="d"
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS]
 
@@ -30,7 +33,7 @@ while getopts ":d:th" opt; do
 			CHROOT_DIR="$OPTARG"
 			;;
 		t)
-			LIST_TARBALLS=1
+			FIND_TYPE="f"
 			;;
 		h)
 			usage
@@ -60,10 +63,4 @@ done
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
-# Display paths to available rootfs instances
-if [[ "$LIST_TARBALLS" -eq 1 ]]
-then
-	find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type f -name "*.tar.gz" -exec basename {} \;
-else
-	find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;
-fi
+find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type "$FIND_TYPE" -exec basename {} \;
