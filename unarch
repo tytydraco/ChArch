@@ -95,7 +95,7 @@ if [[ "$UNMOUNT_ALL" -eq 1 ]]
 then
 	for rootfs in `lsarch -d "$CHROOT_DIR"`
 	do
-		unmount_rootfs "$rootfs"
+		unmount_rootfs "$CHROOT_DIR/$rootfs"
 	done
 else
 	# Check if rootfs exists
