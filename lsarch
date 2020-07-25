@@ -49,7 +49,7 @@ shift $((OPTIND-1))
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in find id
+for dep in basename find id
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -63,7 +63,7 @@ done
 # Display paths to available rootfs instances
 if [[ "$LIST_TARBALLS" -eq 1 ]]
 then
-	find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type f -name "*.tar.gz"
+	find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type f -name "*.tar.gz" -exec basename {} \;
 else
-	find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d
+	find "$CHROOT_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;
 fi
