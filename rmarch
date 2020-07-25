@@ -77,9 +77,9 @@ done
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Handle tarball removal
-if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs" ]]
+if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar" ]]
 then
-	rm "$CHROOT_DIR/rootfs"
+	rm "$CHROOT_DIR/rootfs.tar"
 	exit 0
 fi
 
