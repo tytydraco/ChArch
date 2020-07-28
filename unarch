@@ -105,3 +105,6 @@ else
 
 	unmount_rootfs "$ROOTFS_DIR"
 fi
+
+# Return success regardless of if unmounts silently failed
+exit 0
