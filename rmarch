@@ -80,8 +80,11 @@ done
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Handle tarball removal
-if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$ROOTFS_TAR" ]]
+if [[ "$RM_TARBALL" -eq 1 ]]
 then
+	# Bail if rootfs tarball doesn't exist
+	[[ ! -f "$ROOTFS_TAR" ]] && err "No rootfs tarball at $ROOTFS_TAR. Exiting."
+
 	rm "$ROOTFS_TAR"
 	exit 0
 fi
