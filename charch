@@ -95,14 +95,11 @@ done
 [[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 fetch_rootfs() {
-	if [[ ! -f "$CHROOT_DIR/rootfs.tar" ]]
-	then
-		[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
+	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-		curl -# -L -o "$CHROOT_DIR/rootfs.tar" "$ROOTFS_URL"
+	curl -# -L -o "$CHROOT_DIR/rootfs.tar" "$ROOTFS_URL"
 
-		[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
-	fi
+	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 }
 
 setup_rootfs() {
@@ -221,8 +218,8 @@ then
 	# Create initial chroot home
 	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
 
-	# Fetch latest rootfs tarball for architecture
-	fetch_rootfs
+	# Fetch latest rootfs tarball if needed
+	[[ ! -f "$CHROOT_DIR/rootfs.tar" ]] && fetch_rootfs
 
 	# Extract tarball
 	setup_rootfs
