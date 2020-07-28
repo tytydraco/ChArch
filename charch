@@ -14,6 +14,9 @@ else
 	CHROOT_DIR="$HOME/charch"
 fi
 
+# Path to rootfs tarball
+ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
+
 # Default command to execute on chroot enter
 COMMAND="/bin/su -l"
 
@@ -97,14 +100,14 @@ done
 fetch_rootfs() {
 	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-	curl -# -L -o "$CHROOT_DIR/rootfs.tar" "$ROOTFS_URL"
+	curl -# -L -o "$ROOTFS_TAR" "$ROOTFS_URL"
 
 	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 }
 
 setup_rootfs() {
 	mkdir -p "$ROOTFS_DIR"
-	tar xf "$CHROOT_DIR/rootfs.tar" -C "$ROOTFS_DIR" &> /dev/null
+	tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null
 
 	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
 
@@ -219,7 +222,7 @@ then
 	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
 
 	# Fetch latest rootfs tarball if needed
-	[[ ! -f "$CHROOT_DIR/rootfs.tar" ]] && fetch_rootfs
+	[[ ! -f "$ROOTFS_TAR" ]] && fetch_rootfs
 
 	# Extract tarball
 	setup_rootfs
