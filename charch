@@ -26,6 +26,7 @@ usage() {
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -u URL		Specify a URL to fetch a rootfs tarball from
+  -t TARBALL		Specify a path to fetch a rootfs tarball from
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
   -n			Create a new rootfs instance
   -i			Create fresh mounts instead of recursive host binds
@@ -34,13 +35,18 @@ Options:
 "
 }
 
-while getopts ":d:u:c:nikh" opt; do
+while getopts ":d:u:t:c:nikh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
+			;;
+		t)
+			ROOTFS_TAR="$OPTARG"
+
+			[[ ! -f "$ROOTFS_TAR" ]] && err "No rootfs tarball at $ROOTFS_TAR. Exiting."
 			;;
 		c)
 			COMMAND="$OPTARG"
