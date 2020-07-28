@@ -26,7 +26,7 @@ usage() {
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -u URL		Specify a URL to fetch a rootfs tarball from
-  -t TARBALL		Specify a path to fetch a rootfs tarball from
+  -t TARBALL		Specify a path to fetch a rootfs tarball from (default: $ROOTFS_TAR)
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
   -n			Create a new rootfs instance
   -i			Create fresh mounts instead of recursive host binds
@@ -227,8 +227,10 @@ then
 	# Create initial chroot home
 	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
 
-	# Fetch latest rootfs tarball if needed
-	[[ ! -f "$ROOTFS_TAR" ]] && fetch_rootfs
+	# Only fetch a new rootfs URL if:
+	# 1) A rootfs tarball doesn't already exist, or
+	# 2) User specified a URL to use
+	[[ ! -f "$ROOTFS_TAR" ]] || [[ ! -z "$ROOTFS_URL" ]] && fetch_rootfs
 
 	# Extract tarball
 	setup_rootfs
