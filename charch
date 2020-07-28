@@ -25,30 +25,25 @@ Options:
   -u URL		Specify a URL to fetch a rootfs tarball from
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
   -n			Create a new rootfs instance
-  -f			Force a tarball refetch even if it already exists
   -i			Create fresh mounts instead of recursive host binds
   -k			Keep host mounts after exiting the chroot
   -h			Show usage
 "
 }
 
-while getopts ":d:u:c:nfikh" opt; do
+while getopts ":d:u:c:nikh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
-			FORCE_FETCH=1
 			;;
 		c)
 			COMMAND="$OPTARG"
 			;;
 		n)
 			CREATE=1
-			;;
-		f)
-			FORCE_FETCH=1
 			;;
 		i)
 			ISOLATED=1
@@ -100,7 +95,7 @@ done
 [[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 fetch_rootfs() {
-	if [[ ! -f "$CHROOT_DIR/rootfs.tar" ]] || [[ "$FORCE_FETCH" -eq 1 ]]
+	if [[ ! -f "$CHROOT_DIR/rootfs.tar" ]]
 	then
 		[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
