@@ -86,8 +86,10 @@ unmount_rootfs() {
 	local fullpath=`readlink -f "$1"`
 	for path in `mount | awk '{print $3}' | grep "^$fullpath/" | sort -r`
 	do
-		umount -l -f "$path" &> /dev/null
+		umount -l -f "$path"
 	done
+
+	mountpoint -q "$1" &> /dev/null && umount -l -f "$1"
 }
 
 # Unmount the rootfs filesystems
