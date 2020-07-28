@@ -14,6 +14,9 @@ else
 	CHROOT_DIR="$HOME/charch"
 fi
 
+# Path to rootfs tarball
+ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
+
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
@@ -77,9 +80,9 @@ done
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 # Handle tarball removal
-if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$CHROOT_DIR/rootfs.tar" ]]
+if [[ "$RM_TARBALL" -eq 1 ]] && [[ -f "$ROOTFS_TAR" ]]
 then
-	rm "$CHROOT_DIR/rootfs.tar"
+	rm "$ROOTFS_TAR"
 	exit 0
 fi
 
