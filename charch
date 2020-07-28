@@ -11,7 +11,7 @@ if [[ -d "/data" ]]
 then
 	CHROOT_DIR="/data/local/charch"
 else
-	CHROOT_DIR="~/charch"
+	CHROOT_DIR="$HOME/charch"
 fi
 
 # Default command to execute on chroot enter
