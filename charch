@@ -254,3 +254,5 @@ _chroot "$COMMAND"
 
 # Try to unmount rootfs mounts
 [[ "$KEEP_MOUNTS" -eq 0 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
+
+exit 0
