@@ -118,10 +118,9 @@ setup_rootfs() {
 	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
 
 	# Check for nested rootfs directory
-	local dircount=`ls "$ROOTFS_DIR" | wc -w`
-	if [[ "$dircount" -eq 1 ]]
+	if [[ `ls "$ROOTFS_DIR" | wc -w` -eq 1 ]]
 	then
-		local dirname=`ls "$ROOTFS_DIR" | head -n 1`
+		local dirname=`ls "$ROOTFS_DIR"`
 		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
 		rm -rf "$ROOTFS_DIR/$dirname"
 	fi
@@ -207,15 +206,14 @@ post_install() {
 		_chroot pacman-key --populate
 
 		# Remove built-in linux kernel and firmware
-		_chroot pacman -Rcn --noconfirm linux-firmware
+		_chroot pacman -Rcn --noconfirm linux linux-firmware
 	fi
 
 	# Apt
 	if [[ -d "$ROOTFS_DIR/etc/apt/" ]]
 	then
 		# Remove built-in linux kernel and firmware
-		_chroot apt-get -y remove --auto-remove linux-firmware
-		_chroot apt-get -y remove --auto-remove "^linux-image.*"
+		_chroot apt-get -y remove --auto-remove "^linux-image.*" linux-firmware
 	fi
 }
 
