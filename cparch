@@ -10,6 +10,15 @@ err() {
 	exit 1
 }
 
+# Check for required dependencies
+for dep in cp id unarch
+do
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
+done
+
+# Check for root permissions
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/data" ]]
 then
@@ -45,15 +54,6 @@ done
 shift $((OPTIND-1))
 
 [[ "$1 $2" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
-
-# Check for required dependencies
-for dep in cp id unarch
-do
-	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
-done
-
-# Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Usage check
 if [[ "$#" -ne 2 ]]

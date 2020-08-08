@@ -10,6 +10,15 @@ err() {
 	exit 1
 }
 
+# Check for required dependencies
+for dep in basename find id
+do
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
+done
+
+# Check for root permissions
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/data" ]]
 then
@@ -50,15 +59,6 @@ while getopts ":d:th" opt; do
 	esac
 done
 shift $((OPTIND-1))
-
-# Check for required dependencies
-for dep in basename find id
-do
-	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
-done
-
-# Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
 
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
