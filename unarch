@@ -61,7 +61,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
-for dep in awk grep id lsarch mount readlink seq sort umount
+for dep in awk fuser grep id lsarch mount readlink seq sort umount
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -73,14 +73,8 @@ done
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
 unmount_rootfs() {
-	# Check for optional lsof dependency to automatically kill processes
-	if command -v lsof &> /dev/null
-	then
-		for pid in `lsof -t "$1"`
-		do
-			kill "$pid" &> /dev/null
-		done
-	fi
+	# Kill all active processes
+	fuser -sk "$1"
 
 	# Do unmounts now
 	local fullpath=`readlink -f "$1"`
