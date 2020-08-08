@@ -1,6 +1,10 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="/sbin/.magisk/busybox:$PATH"
+
 err() {
 	echo -e "\e[91m[!] $@\e[39m"
 	exit 1
@@ -55,10 +59,6 @@ fi
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
-
-# Add busybox components from Magisk
-[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
-	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
 for dep in awk fuser grep id lsarch mount readlink seq sort umount

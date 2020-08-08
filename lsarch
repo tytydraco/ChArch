@@ -1,6 +1,10 @@
 #!/bin/bash
 # Written by Draco (tytydraco) @ GitHub
 
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="/sbin/.magisk/busybox:$PATH"
+
 err() {
 	echo -e "\e[91m[!] $@\e[39m"
 	exit 1
@@ -46,10 +50,6 @@ while getopts ":d:th" opt; do
 	esac
 done
 shift $((OPTIND-1))
-
-# Add busybox components from Magisk
-[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
-	export PATH="$PATH:/sbin/.magisk/busybox"
 
 # Check for required dependencies
 for dep in basename find id
