@@ -204,16 +204,6 @@ post_install() {
 		# Update and populate pacman keys
 		_chroot pacman-key --init
 		_chroot pacman-key --populate
-
-		# Remove built-in linux kernel and firmware
-		_chroot pacman -Rcn --noconfirm linux linux-firmware
-	fi
-
-	# Apt
-	if [[ -d "$ROOTFS_DIR/etc/apt/" ]]
-	then
-		# Remove built-in linux kernel and firmware
-		_chroot apt-get -y remove --auto-remove "^linux-image.*" linux-firmware
 	fi
 }
 

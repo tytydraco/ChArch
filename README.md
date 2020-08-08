@@ -7,7 +7,6 @@ A set of scripts to manage chroot containers on Linux.
 - Portable. Take your rootfs instances with you on an external drive.
 - Fast. ChArch uses raw filesystems instead of loopback devices.
 - Easy. ChArch can configure an entire rootfs instance in less than a minute (YMMV).
-- Small. ChArch removes the Linux Kernel images and firmware packages, resulting in a ~0.5 GiB rootfs instance.
 - Compatible. ChArch uses relatively few dependencies and Magisk BusyBox is used as a fallback for Android devices.
 - Seamless. ChArch supports multiple running rootfs instances at the same time, and even in the background.
 
