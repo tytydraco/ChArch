@@ -31,7 +31,7 @@ fi
 ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
 
 # Default command to execute on chroot enter
-COMMAND="/bin/su -l"
+COMMAND="/usr/bin/env su -l"
 
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
