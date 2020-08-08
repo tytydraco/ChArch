@@ -194,17 +194,6 @@ post_install() {
 	rm "$ROOTFS_DIR/etc/resolv.conf"
 	echo "nameserver 1.1.1.1" > "$ROOTFS_DIR/etc/resolv.conf"
 	echo "nameserver 1.0.0.1" >> "$ROOTFS_DIR/etc/resolv.conf"
-
-	# Pacman
-	if [[ -f "$ROOTFS_DIR/etc/pacman.conf" ]]
-	then
-		# Fix broken space check for pacman in chroot
-		sed -i "s/^CheckSpace$/#CheckSpace/" "$ROOTFS_DIR/etc/pacman.conf"
-
-		# Update and populate pacman keys
-		_chroot pacman-key --init
-		_chroot pacman-key --populate
-	fi
 }
 
 # Create a new rootfs instance
