@@ -22,7 +22,7 @@ done
 # Path containing rootfs tarball and all rootfs instances
 if [[ -d "/data" ]]
 then
-	CHROOT_DIR="/data/local/charch"
+	CHROOT_DIR="/data/unencrypted/charch"
 else
 	CHROOT_DIR="$HOME/charch"
 fi
