@@ -133,6 +133,7 @@ safe_mount() {
 	if [[ -d "$1" ]]
 	then
 		mount --rbind "$1" "$ROOTFS_DIR$1"
+		mount --make-rslave "$ROOTFS_DIR$1"
 	else
 		mount -t tmpfs tmpfs "$ROOTFS_DIR$1"
 	fi
