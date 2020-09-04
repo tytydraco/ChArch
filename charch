@@ -163,7 +163,7 @@ find_mountpoint() {
 }
 
 setup_mounts() {
-	safe_mount tmpfs /dev
+	safe_rbind /dev
 	safe_mount sysfs /sys
 	safe_mount proc /proc
 	safe_mount tmpfs /tmp
