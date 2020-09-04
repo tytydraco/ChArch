@@ -130,7 +130,7 @@ safe_mount() {
 	! mountpoint -q "$ROOTFS_DIR$2" &> /dev/null && mount -t "$1" "$1" "$ROOTFS_DIR$2"
 }
 
-safe_bind() {
+safe_rbind() {
 	# Ensure the bind exists on the host
 	[[ ! -d "$1" ]] && return 0
 
@@ -138,15 +138,7 @@ safe_bind() {
 	[[ ! -d "$ROOTFS_DIR$1" ]] && mkdir -p "$ROOTFS_DIR$1"
 
 	# Bind if it exists and it is not already mounted
-	! mountpoint -q "$ROOTFS_DIR$1" &> /dev/null && mount --bind "$1" "$ROOTFS_DIR$1"
-}
-
-safe_rbind() {
-	safe_bind "$1"
-	for path in `mount | awk '{print $3}' | grep "^$1/"`
-	do
-		safe_bind "$path"
-	done
+	! mountpoint -q "$ROOTFS_DIR$1" &> /dev/null && mount --rbind "$1" "$ROOTFS_DIR$1"
 }
 
 find_mountpoint() {
@@ -164,8 +156,8 @@ find_mountpoint() {
 
 setup_mounts() {
 	safe_rbind /dev
-	safe_mount sysfs /sys
-	safe_mount proc /proc
+	safe_rbind /sys
+	safe_rbind /proc
 	safe_mount tmpfs /tmp
 
 	# Remount data partition with suid to allow sudo to function
