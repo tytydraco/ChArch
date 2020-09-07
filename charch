@@ -164,7 +164,7 @@ setup_mounts() {
 }
 
 _chroot() {
-	env -i "${ENV[@]}" chroot "$ROOTFS_DIR" $@
+	env -i "${ENV[@]}" `which chroot` "$ROOTFS_DIR" $@
 }
 
 post_install() {
