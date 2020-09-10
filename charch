@@ -140,16 +140,16 @@ safe_mount() {
 }
 
 find_mountpoint() {
-        local path=`readlink -f "$1"`
-        until mountpoint -q "$path" &>/dev/null
-        do
-                path=${path%/*}
-                path=${path:-/}
+	local path=`readlink -f "$1"`
+	until mountpoint -q "$path" &>/dev/null
+	do
+		path=${path%/*}
+		path=${path:-/}
 
 		# Break if we reach the end of the filesystem
 		[[ "$path" == "/" ]] && ! mountpoint -q "/" &> /dev/null && break
-        done
-        echo "$path"
+	done
+	echo "$path"
 }
 
 setup_mounts() {
