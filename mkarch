@@ -119,9 +119,6 @@ post_install() {
 # Extract tarball
 setup_rootfs
 
-# Mount host binds
-setup_mounts
-
 # Fix common chroot issues and do post-install config
 post_install &> /dev/null
 
