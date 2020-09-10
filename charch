@@ -11,7 +11,7 @@ err() {
 }
 
 # Check for required dependencies
-for dep in chroot curl env find id mkdir mount mountpoint readlink rm sed tar unarch wc which
+for dep in chroot env id mkdir mount mountpoint readlink rm unarch which
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -27,9 +27,6 @@ else
 	CHROOT_DIR="$HOME/charch"
 fi
 
-# Path to rootfs tarball
-ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
-
 # Default command to execute on chroot enter
 COMMAND="/usr/bin/env su -l"
 
@@ -38,33 +35,19 @@ usage() {
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
-  -u URL		Specify a URL to fetch a rootfs tarball from
-  -t TARBALL		Specify a path to fetch a rootfs tarball from (default: $ROOTFS_TAR)
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
-  -n			Create a new rootfs instance
   -k			Keep host mounts after exiting the chroot
   -h			Show usage
 "
 }
 
-while getopts ":d:u:t:c:nkh" opt; do
+while getopts ":d:c:kh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
-		u)
-			ROOTFS_URL="$OPTARG"
-			;;
-		t)
-			ROOTFS_TAR="$OPTARG"
-
-			[[ ! -f "$ROOTFS_TAR" ]] && err "No rootfs tarball at $ROOTFS_TAR. Exiting."
-			;;
 		c)
 			COMMAND="$OPTARG"
-			;;
-		n)
-			CREATE=1
 			;;
 		k)
 			KEEP_MOUNTS=1
@@ -93,29 +76,6 @@ ENV=(
 	HOME="/root"
 	TERM=${TERM:-xterm-256-color}
 )
-
-fetch_rootfs() {
-	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
-
-	curl -# -L -o "$ROOTFS_TAR" "$ROOTFS_URL"
-
-	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
-}
-
-setup_rootfs() {
-	mkdir -p "$ROOTFS_DIR"
-	tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null
-
-	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
-
-	# Check for nested rootfs directory
-	if [[ `ls "$ROOTFS_DIR" | wc -w` -eq 1 ]]
-	then
-		local dirname=`ls "$ROOTFS_DIR"`
-		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
-		rm -rf "$ROOTFS_DIR/$dirname"
-	fi
-}
 
 safe_mount() {
 	# Exit if we are already mounted
@@ -162,42 +122,10 @@ _chroot() {
 	env -i "${ENV[@]}" `which chroot` "$ROOTFS_DIR" $@
 }
 
-post_install() {
-	# Add dns since userspace dns is volatile
-	rm "$ROOTFS_DIR/etc/resolv.conf"
-	echo "nameserver 1.1.1.1" > "$ROOTFS_DIR/etc/resolv.conf"
-	echo "nameserver 1.0.0.1" >> "$ROOTFS_DIR/etc/resolv.conf"
-}
+[[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
-# Create a new rootfs instance
-if [[ "$CREATE" -eq 1 ]]
-then
-	[[ -d "$ROOTFS_DIR" ]] && err "Rootfs instance already exists at $ROOTFS_DIR. Exiting."
-
-	[[ ! -f "$ROOTFS_TAR" ]] && [[ -z "$ROOTFS_URL" ]] && err "No tarball URL of path specified. Exiting."
-
-	# Create initial chroot home
-	[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
-
-	# Only fetch a new rootfs URL if:
-	# 1) A rootfs tarball doesn't already exist, or
-	# 2) User specified a URL to use
-	[[ ! -f "$ROOTFS_TAR" ]] || [[ ! -z "$ROOTFS_URL" ]] && fetch_rootfs
-
-	# Extract tarball
-	setup_rootfs
-
-	# Mount host binds
-	setup_mounts
-
-	# Fix common chroot issues and do post-install config
-	post_install &> /dev/null
-else
-	[[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
-
-	# Mount host binds
-	setup_mounts
-fi
+# Mount host binds
+setup_mounts
 
 # Enter chroot environment
 _chroot "$COMMAND"

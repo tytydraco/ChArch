@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Written by Draco (tytydraco) @ GitHub
+
+# Add busybox components from Magisk
+[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
+	export PATH="/sbin/.magisk/busybox:$PATH"
+
+err() {
+	echo -e "\e[91m[!] $@\e[39m"
+	exit 1
+}
+
+# Check for required dependencies
+for dep in curl find id mkdir rm sed tar wc
+do
+	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
+done
+
+# Check for root permissions
+[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+
+# Path containing rootfs tarball and all rootfs instances
+if [[ -d "/data" ]]
+then
+	CHROOT_DIR="/data/unencrypted/charch"
+else
+	CHROOT_DIR="$HOME/charch"
+fi
+
+# Path to rootfs tarball
+ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
+
+usage() {
+	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
+
+Options:
+  -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
+  -u URL		Specify a URL to fetch a rootfs tarball from
+  -t TARBALL		Specify a path to fetch a rootfs tarball from (default: $ROOTFS_TAR)
+  -h			Show usage
+"
+}
+
+while getopts ":d:u:t:h" opt; do
+	case $opt in
+		d)
+			CHROOT_DIR="$OPTARG"
+			;;
+		u)
+			ROOTFS_URL="$OPTARG"
+			;;
+		t)
+			ROOTFS_TAR="$OPTARG"
+
+			[[ ! -f "$ROOTFS_TAR" ]] && err "No rootfs tarball at $ROOTFS_TAR. Exiting."
+			;;
+		h)
+			usage
+			exit 0
+			;;
+		*)
+			usage
+			exit 1
+			;;
+	esac
+done
+shift $((OPTIND-1))
+
+# The name of the current rootfs instance
+ROOTFS=${1:-rootfs}
+[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
+
+# Path to root of rootfs instance
+ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
+
+fetch_rootfs() {
+	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
+
+	curl -# -L -o "$ROOTFS_TAR" "$ROOTFS_URL"
+
+	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
+}
+
+setup_rootfs() {
+	mkdir -p "$ROOTFS_DIR"
+	tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null
+
+	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
+
+	# Check for nested rootfs directory
+	if [[ `ls "$ROOTFS_DIR" | wc -w` -eq 1 ]]
+	then
+		local dirname=`ls "$ROOTFS_DIR"`
+		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
+		rm -rf "$ROOTFS_DIR/$dirname"
+	fi
+}
+
+post_install() {
+	# Add dns since userspace dns is volatile
+	rm "$ROOTFS_DIR/etc/resolv.conf"
+	echo "nameserver 1.1.1.1" > "$ROOTFS_DIR/etc/resolv.conf"
+	echo "nameserver 1.0.0.1" >> "$ROOTFS_DIR/etc/resolv.conf"
+}
+
+# Create a new rootfs instance
+[[ -d "$ROOTFS_DIR" ]] && err "Rootfs instance already exists at $ROOTFS_DIR. Exiting."
+
+[[ ! -f "$ROOTFS_TAR" ]] && [[ -z "$ROOTFS_URL" ]] && err "No tarball URL of path specified. Exiting."
+
+# Create initial chroot home
+[[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
+
+# Only fetch a new rootfs URL if:
+# 1) A rootfs tarball doesn't already exist, or
+# 2) User specified a URL to use
+[[ ! -f "$ROOTFS_TAR" ]] || [[ ! -z "$ROOTFS_URL" ]] && fetch_rootfs
+
+# Extract tarball
+setup_rootfs
+
+# Mount host binds
+setup_mounts
+
+# Fix common chroot issues and do post-install config
+post_install &> /dev/null
+
+exit 0
