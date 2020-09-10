@@ -58,13 +58,8 @@ done
 shift $((OPTIND-1))
 
 # The name of the current rootfs instance
-if [[ ! -z "$1" ]]
-then
-	ROOTFS="$1"
-	[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
-else
-	ROOTFS="rootfs"
-fi
+ROOTFS=${1:-rootfs}
+[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
