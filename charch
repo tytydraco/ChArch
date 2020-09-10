@@ -96,7 +96,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Environmental variables for the chroot
 ENV=(
 	HOME="/root"
-	TERM="xterm-256color"
+	TERM="$TERM"
 )
 
 fetch_rootfs() {
