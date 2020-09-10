@@ -77,20 +77,20 @@ ENV=(
 	TERM=${TERM:-xterm-256-color}
 )
 
-safe_mount() {
+safe_mount_dir() {
 	# Exit if we are already mounted
 	mountpoint -q "$ROOTFS_DIR$1" &> /dev/null && return 0
-
-	# Create the mount point if it is missing
-	[[ ! -d "$ROOTFS_DIR$1" ]] && mkdir -p "$ROOTFS_DIR$1"
 
 	# Recursive bind if available, otherwise make a tmpfs
 	if [[ -d "$1" ]]
 	then
+		mkdir -p "$ROOTFS_DIR$1"
 		mount --rbind "$1" "$ROOTFS_DIR$1"
 		mount --make-rslave "$ROOTFS_DIR$1"
-	else
-		mount -t tmpfs tmpfs "$ROOTFS_DIR$1"
+	elif [[ ! -z "$2" ]]
+	then
+		mkdir -p "$ROOTFS_DIR$1"
+		mount -t "$2" "$2" "$ROOTFS_DIR$1"
 	fi
 }
 
@@ -108,10 +108,9 @@ find_mountpoint() {
 }
 
 setup_mounts() {
-	safe_mount /dev
-	safe_mount /sys
-	safe_mount /proc
-	safe_mount /tmp
+	safe_mount_dir /dev tmpfs
+	safe_mount_dir /sys sysfs
+	safe_mount_dir /proc proc
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
