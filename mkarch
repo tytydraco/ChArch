@@ -76,7 +76,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 fetch_rootfs() {
 	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-	wget -qO - "$ROOTFS_TAR" "$ROOTFS_URL"
+	wget -qO "$ROOTFS_TAR" "$ROOTFS_URL"
 
 	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 }
