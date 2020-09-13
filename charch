@@ -36,12 +36,12 @@ usage() {
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
   -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
-  -k			Keep host mounts after exiting the chroot
+  -u			Unmount host mounts after exiting the chroot
   -h			Show usage
 "
 }
 
-while getopts ":d:c:kh" opt; do
+while getopts ":d:c:uh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
@@ -49,8 +49,8 @@ while getopts ":d:c:kh" opt; do
 		c)
 			COMMAND="$OPTARG"
 			;;
-		k)
-			KEEP_MOUNTS=1
+		u)
+			UNMOUNT=1
 			;;
 		h)
 			usage
@@ -144,6 +144,6 @@ setup_mounts
 _chroot "$COMMAND"
 
 # Try to unmount rootfs mounts
-[[ "$KEEP_MOUNTS" -eq 0 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
+[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
 
 exit 0
