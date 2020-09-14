@@ -106,7 +106,7 @@ post_install() {
 # Create a new rootfs instance
 [[ -d "$ROOTFS_DIR" ]] && err "Rootfs instance already exists at $ROOTFS_DIR. Exiting."
 
-[[ ! -f "$ROOTFS_TAR" ]] && [[ -z "$ROOTFS_URL" ]] && err "No tarball URL of path specified. Exiting."
+[[ ! -f "$ROOTFS_TAR" ]] && [[ -z "$ROOTFS_URL" ]] && err "No tarball specified. Exiting."
 
 # Create initial chroot home
 [[ ! -d "$CHROOT_DIR" ]] && mkdir -p "$CHROOT_DIR"
