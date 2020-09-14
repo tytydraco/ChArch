@@ -35,14 +35,18 @@ usage() {
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
+  -s			Simple output; only display the rootfs names
   -h			Show usage
 "
 }
 
-while getopts ":d:th" opt; do
+while getopts ":d:sh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
+			;;
+		s)
+			SIMPLE=1
 			;;
 		h)
 			usage
@@ -58,6 +62,12 @@ shift $((OPTIND-1))
 
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
+
+if [[ "$SIMPLE" -eq 1 ]]
+then
+	ls "$CHROOT_DIR"
+	exit 0
+fi
 
 printf "%-10s\t%-16s\t%-8s\n" "NAME" "PATH" "SIZE"
 for rootfs in `ls "$CHROOT_DIR"`
