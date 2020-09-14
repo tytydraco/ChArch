@@ -74,7 +74,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Environmental variables for the chroot
 ENV=(
 	HOME="/root"
-	TERM=${TERM:-xterm-256-color}
+	TERM=${TERM:-xterm-256color}
 )
 
 safe_mount_dir() {
