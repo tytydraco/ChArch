@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 # Written by Draco (tytydraco) @ GitHub
 
-# Add busybox components from Magisk
-[[ -d "/sbin/.magisk/busybox" ]] && [[ "$PATH" != *"/sbin/.magisk/busybox"* ]] &&
-	export PATH="/sbin/.magisk/busybox:$PATH"
-
 err() {
 	echo -e "\e[91m[!] $@\e[39m"
 	exit 1
