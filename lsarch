@@ -11,7 +11,7 @@ err() {
 }
 
 # Check for required dependencies
-for dep in basename find id
+for dep in awk basename du find id printf
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -35,7 +35,6 @@ usage() {
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
-  -t			List any existing rootfs tarballs
   -h			Show usage
 "
 }
@@ -44,9 +43,6 @@ while getopts ":d:th" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
-			;;
-		t)
-			FIND_TYPE="f"
 			;;
 		h)
 			usage
@@ -63,4 +59,9 @@ shift $((OPTIND-1))
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
-find "$CHROOT_DIR" -mindepth 1 -maxdepth 1 -type "$FIND_TYPE" -exec basename {} \;
+printf "%-10s\t%-16s\t%-8s\n" "NAME" "PATH" "SIZE"
+for rootfs in `ls "$CHROOT_DIR"`
+do
+	size=`du -sh "$CHROOT_DIR/$rootfs" | awk '{ print $1 }'`
+	printf "%-10s\t%-16s\t%-8s\n" "$rootfs" "$CHROOT_DIR/$rootfs" "$size"
+done
