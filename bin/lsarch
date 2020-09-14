@@ -60,9 +60,9 @@ then
 	exit 0
 fi
 
-printf "%-10s\t%-16s\t%-8s\n" "NAME" "PATH" "SIZE"
+printf "%-16s\t%-32s\t%-8s\n" "NAME" "PATH" "SIZE"
 for rootfs in `ls "$CHROOT_DIR"`
 do
 	size=`du -sh "$CHROOT_DIR/$rootfs" | awk '{ print $1 }'`
-	printf "%-10s\t%-16s\t%-8s\n" "$rootfs" "$CHROOT_DIR/$rootfs" "$size"
+	printf "%-16s\t%-32s\t%-8s\n" "$rootfs" "$CHROOT_DIR/$rootfs" "$size"
 done
