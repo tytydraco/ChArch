@@ -125,7 +125,7 @@ setup_mounts() {
 
 	# Remount data partition with suid to allow sudo to function
 	local root_mount=`find_mountpoint "$CHROOT_DIR"`
-	mountpoint -q "$root_mount" &> /dev/null && mount -o remount,suid,exec "$root_mount"
+	mountpoint -q "$root_mount" &> /dev/null && mount -o remount,suid,exec "$root_mount" &> /dev/null
 }
 
 _chroot() {
