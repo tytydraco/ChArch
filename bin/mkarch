@@ -56,7 +56,7 @@ done
 shift $((OPTIND-1))
 
 # Path to rootfs tarball
-ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
+ROOTFS_TAR="${ROOTFS_TAR:-$CHROOT_DIR/rootfs.tar}"
 
 # The name of the current rootfs instance
 ROOTFS=${1:-rootfs}
