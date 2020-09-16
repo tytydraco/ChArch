@@ -24,9 +24,6 @@ else
 	CHROOT_DIR="$HOME/charch"
 fi
 
-# Path to rootfs tarball
-ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
-
 usage() {
 	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
 
@@ -62,6 +59,9 @@ while getopts ":d:u:t:h" opt; do
 	esac
 done
 shift $((OPTIND-1))
+
+# Path to rootfs tarball
+ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"
 
 # The name of the current rootfs instance
 ROOTFS=${1:-rootfs}
