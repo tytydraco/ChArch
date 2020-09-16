@@ -68,8 +68,6 @@ unmount_rootfs() {
 	do
 		umount -l -f "$path"
 	done
-
-	mountpoint -q "$1" &> /dev/null && umount -l -f "$1"
 }
 
 # Unmount the rootfs filesystems
