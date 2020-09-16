@@ -69,31 +69,37 @@ ENV=(
 )
 
 safe_mount_dir() {
+	local guest_mount="$ROOTFS_DIR$1"
+
 	# Exit if we are already mounted
-	mountpoint -q "$ROOTFS_DIR$1" &> /dev/null && return 0
+	mountpoint -q "$guest_mount" &> /dev/null && return 0
 
 	# Recursive bind if available, otherwise make a fallback
 	if [[ -d "$1" ]]
 	then
-		mkdir -p "$ROOTFS_DIR$1"
-		mount --rbind "$1" "$ROOTFS_DIR$1"
-		mount --make-rslave "$ROOTFS_DIR$1"
+		mkdir -p "$guest_mount"
+		mount --rbind "$1" "$guest_mount"
+		mount --make-rslave "$guest_mount"
 	elif [[ ! -z "$2" ]]
 	then
-		mkdir -p "$ROOTFS_DIR$1"
-		mount -t "$2" "$2" "$ROOTFS_DIR$1"
+		mkdir -p "$guets_mount"
+		mount -t "$2" "$2" "$guest_mount"
 	fi
 }
 
 safe_mount_file() {
+	local guest_mount="$ROOTFS_DIR$1"
+
 	# Exit if we are already mounted
-	mountpoint -q "$ROOTFS_DIR$1" &> /dev/null && return 0
+	mountpoint -q "$guest_mount" &> /dev/null && return 0
 
 	# Bind if available
 	if [[ -f "$1" ]]
 	then
-		mount --bind "$1" "$ROOTFS_DIR$1"
-		mount --make-slave "$ROOTFS_DIR$1"
+		mkdir -p "${guest_mount%/*}"
+		[[ ! -f "$guest_mount" ]] && touch "$guest_mount"
+		mount --bind "$1" "$guest_mount"
+		mount --make-slave "$guest_mount"
 	fi
 }
 
