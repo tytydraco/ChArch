@@ -7,7 +7,7 @@ err() {
 }
 
 # Check for required dependencies
-for dep in chroot env id mkdir mount mountpoint readlink rm unarch which
+for dep in chroot env id mkdir mount mountpoint readlink rm touch unarch which
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
