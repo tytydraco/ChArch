@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@\e"
+	echo -e " \e[91m*\e[39m $@"
 	exit 1
 }
 
