@@ -75,7 +75,7 @@ unmount_rootfs() {
 # Unmount the rootfs filesystems
 if [[ "$UNMOUNT_ALL" -eq 1 ]]
 then
-	for rootfs in `lsarch -d "$CHROOT_DIR"`
+	for rootfs in `lsarch -s -d "$CHROOT_DIR"`
 	do
 		unmount_rootfs "$CHROOT_DIR/$rootfs"
 	done
