@@ -70,6 +70,7 @@ ROOTFS=${1:-rootfs}
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 
+# Pull the rootfs from the specified URL
 fetch_rootfs() {
 	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
@@ -78,6 +79,7 @@ fetch_rootfs() {
 	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
 }
 
+# Extract the rootfs and make it usable
 setup_rootfs() {
 	mkdir -p "$ROOTFS_DIR"
 	tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null
@@ -93,6 +95,7 @@ setup_rootfs() {
 	fi
 }
 
+# Configure anything post-install
 post_install() {
 	# Add dns since userspace dns is volatile
 	rm "$ROOTFS_DIR/etc/resolv.conf"

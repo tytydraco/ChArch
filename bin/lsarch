@@ -55,12 +55,14 @@ shift $((OPTIND-1))
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."
 
+# List just the directory names and exit
 if [[ "$SIMPLE" -eq 1 ]]
 then
 	ls "$CHROOT_DIR"
 	exit 0
 fi
 
+# List the directory names and full paths
 printf "%-16s\t%-32s\t%-8s\n" "NAME" "PATH"
 for rootfs in `ls "$CHROOT_DIR"`
 do

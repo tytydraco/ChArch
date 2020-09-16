@@ -69,6 +69,7 @@ ENV=(
 	TERM=${TERM:-xterm-256color}
 )
 
+# Recursive bind a directory, otherwise make a fallback mount if provided
 safe_mount_dir() {
 	local guest_mount="$ROOTFS_DIR$1"
 
@@ -88,6 +89,7 @@ safe_mount_dir() {
 	fi
 }
 
+# Bind a file, creating it if it does not exist
 safe_mount_file() {
 	local guest_mount="$ROOTFS_DIR$1"
 
@@ -104,7 +106,7 @@ safe_mount_file() {
 	fi
 }
 
-
+# Find the outermost mountpoint that charch is currently executing from
 find_mountpoint() {
 	local path=`readlink -f "$1"`
 	until mountpoint -q "$path" &>/dev/null
@@ -118,6 +120,7 @@ find_mountpoint() {
 	echo "$path"
 }
 
+# Mount essentials and remound current mount as suid,exec
 setup_mounts() {
 	safe_mount_dir /dev tmpfs
 	safe_mount_dir /sys sysfs
@@ -130,6 +133,7 @@ setup_mounts() {
 		mount -o remount,suid,exec "$root_mount" &> /dev/null
 }
 
+# Enter the chroot with the provided command
 _chroot() {
 	env -i "${ENV[@]}" `which chroot` "$ROOTFS_DIR" $@
 }
