@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Written by Draco (tytydraco) @ GitHub
 
+# Log in red and exit
 err() {
-	echo -e "\e[91m[!] $@\e[39m"
+	echo -e " \e[91m*\e[39m $@\e"
 	exit 1
 }
 
