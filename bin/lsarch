@@ -58,13 +58,16 @@ shift $((OPTIND - 1))
 # List just the directory names and exit
 if [[ "$SIMPLE" -eq 1 ]]
 then
-	ls "$CHROOT_DIR"
+	for rootfs in "$CHROOT_DIR"/*
+	do
+		echo "$rootfs"
+	done
 	exit 0
 fi
 
 # List the directory names and full paths
 printf "%-16s\t%-32s\t%-8s\n" "NAME" "PATH"
-for rootfs in `ls "$CHROOT_DIR"`
+for rootfs in "$CHROOT_DIR"/*
 do
-	printf "%-16s\t%-32s\t%-8s\n" "$rootfs" "$CHROOT_DIR/$rootfs"
+	printf "%-16s\t%-32s\t%-8s\n" "$rootfs" "$CHROOT_DIR$rootfs"
 done
