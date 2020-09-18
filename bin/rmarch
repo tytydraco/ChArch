@@ -51,7 +51,7 @@ while getopts ":d:n:tah" opt; do
 			;;
 	esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 # Path to rootfs tarball
 ROOTFS_TAR="$CHROOT_DIR/rootfs.tar"

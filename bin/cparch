@@ -43,7 +43,7 @@ while getopts ":d:h" opt; do
 			;;
 	esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 [[ "$1 $2" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 

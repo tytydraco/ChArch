@@ -50,7 +50,7 @@ while getopts ":d:sh" opt; do
 			;;
 	esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 # Check if chroot container exists
 [[ ! -d "$CHROOT_DIR" ]] && err "No container at $CHROOT_DIR. Exiting."

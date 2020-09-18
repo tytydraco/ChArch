@@ -47,7 +47,7 @@ while getopts ":d:ah" opt; do
 			;;
 	esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 # The name of the current rootfs instance
 ROOTFS=${1:-rootfs}
