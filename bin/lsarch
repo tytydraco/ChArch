@@ -60,7 +60,7 @@ if [[ "$SIMPLE" -eq 1 ]]
 then
 	for rootfs in "$CHROOT_DIR"/*
 	do
-		echo "$rootfs"
+		echo `basename "$rootfs"`
 	done
 	exit 0
 fi
