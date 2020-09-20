@@ -19,27 +19,28 @@ done
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
-# Default command to execute on chroot enter
-COMMAND="/usr/bin/env su -l"
+# The name of the current rootfs instance
+ROOTFS="rootfs"
 
 usage() {
-	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS] [COMMAND]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
-  -c COMMAND		Command to execute inside the rootfs instance (default: $COMMAND)
+  -n NAME		The name of the rootfs instance to enter (default: $ROOTFS)
   -u			Unmount host mounts after exiting the chroot
   -h			Show usage
 "
 }
 
-while getopts ":d:c:uh" opt; do
+while getopts ":d:n:uh" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
 			;;
-		c)
-			COMMAND="$OPTARG"
+		n)
+			ROOTFS="$OPTARG"
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		u)
 			UNMOUNT=1
@@ -56,9 +57,8 @@ while getopts ":d:c:uh" opt; do
 done
 shift $((OPTIND - 1))
 
-# The name of the current rootfs instance
-ROOTFS=${1:-rootfs}
-[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
+# Default command to execute on chroot enter
+COMMAND="${*:-"/usr/bin/env su -l"}"
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
@@ -82,7 +82,7 @@ safe_mount_dir() {
 		mkdir -p "$guest_mount"
 		mount --rbind "$1" "$guest_mount"
 		mount --make-rslave "$guest_mount"
-	elif [[ ! -z "$2" ]]
+	elif [[ -n "$2" ]]
 	then
 		mkdir -p "$guest_mount"
 		mount -t "$2" "$2" "$guest_mount"
@@ -116,8 +116,7 @@ setup_mounts() {
 
 # Enter the chroot with the provided command
 _chroot() {
-	# shellcheck disable=SC2068
-	env -i "${ENV[@]}" "$(which chroot)" "$ROOTFS_DIR" $@
+	env -i "${ENV[@]}" "$(which chroot)" "$ROOTFS_DIR" "$COMMAND"
 }
 
 [[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
@@ -126,9 +125,9 @@ _chroot() {
 setup_mounts
 
 # Enter chroot environment
-_chroot "$COMMAND"
+_chroot
 
 # Try to unmount rootfs mounts
-[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" "$ROOTFS"
+[[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" -n "$ROOTFS"
 
 exit 0

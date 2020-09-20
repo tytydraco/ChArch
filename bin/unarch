@@ -19,20 +19,28 @@ done
 # Path containing rootfs tarball and rootfs instances
 CHROOT_DIR="$HOME/charch"
 
+# The name of the current rootfs instance
+ROOTFS="rootfs"
+
 usage() {
-	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
+  -n NAME		The name of the rootfs instance to enter (default: $ROOTFS)
   -a			Unmount all rootfs instances in the chroot container directory
   -h			Show usage
 "
 }
 
-while getopts ":d:ah" opt; do
+while getopts ":d:n:ah" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
+			;;
+		n)
+			ROOTFS="$OPTARG"
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		a)
 			UNMOUNT_ALL=1
@@ -48,10 +56,6 @@ while getopts ":d:ah" opt; do
 	esac
 done
 shift $((OPTIND - 1))
-
-# The name of the current rootfs instance
-ROOTFS=${1:-rootfs}
-[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"

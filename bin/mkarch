@@ -19,21 +19,29 @@ done
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
+# The name of the current rootfs instance
+ROOTFS="rootfs"
+
 usage() {
-	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
+  -n NAME		The name of the rootfs instance to enter (default: $ROOTFS)
   -u URL		Specify a URL to fetch a rootfs tarball from
   -t TARBALL		Specify a path to fetch a rootfs tarball from (default: $ROOTFS_TAR)
   -h			Show usage
 "
 }
 
-while getopts ":d:u:t:h" opt; do
+while getopts ":d:n:u:t:h" opt; do
 	case $opt in
 		d)
 			CHROOT_DIR="$OPTARG"
+			;;
+		n)
+			ROOTFS="$OPTARG"
+			[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
 			;;
 		u)
 			ROOTFS_URL="$OPTARG"
@@ -58,10 +66,6 @@ shift $((OPTIND - 1))
 # Path to rootfs tarball
 ROOTFS_TAR="${ROOTFS_TAR:-$CHROOT_DIR/rootfs.tar}"
 
-# The name of the current rootfs instance
-ROOTFS=${1:-rootfs}
-[[ "$ROOTFS" == *[/.]* ]] && err "Rootfs name contains illegal characters. Exiting."
-
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 
@@ -75,9 +79,8 @@ fetch_rootfs() {
 # Extract the rootfs and make it usable
 setup_rootfs() {
 	mkdir -p "$ROOTFS_DIR"
-	tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null
-
-	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
+	! tar xf "$ROOTFS_TAR" -C "$ROOTFS_DIR" &> /dev/null &&
+		err "Failed to extract rootfs tarball. Exiting."
 
 	# Check for nested rootfs directory
 	if [[ "$(find "$ROOTFS_DIR" -mindepth 1 -maxdepth 1 | wc -w)" -eq 1 ]]
