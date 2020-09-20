@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
@@ -14,13 +14,13 @@ do
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -69,9 +69,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 fetch_rootfs() {
 	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-	wget -qO "$ROOTFS_TAR" "$ROOTFS_URL"
-
-	[[ $? -ne 0 ]] && err "Failed to fetch rootfs tarball. Exiting."
+	! wget -qO "$ROOTFS_TAR" "$ROOTFS_URL" && err "Failed to fetch rootfs tarball. Exiting."
 }
 
 # Extract the rootfs and make it usable
@@ -82,11 +80,12 @@ setup_rootfs() {
 	[[ $? -ne 0 ]] && err "Failed to extract rootfs tarball. Exiting."
 
 	# Check for nested rootfs directory
-	if [[ `ls "$ROOTFS_DIR" | wc -w` -eq 1 ]]
+	if [[ "$(find "$ROOTFS_DIR" -mindepth 1 -maxdepth 1 | wc -w)" -eq 1 ]]
 	then
-		local dirname=`ls "$ROOTFS_DIR"`
+		local dirname
+		dirname="$(ls "$ROOTFS_DIR")"
 		find "$ROOTFS_DIR/$dirname" -maxdepth 1 -mindepth 1 -exec mv {} "$ROOTFS_DIR" \;
-		rm -rf "$ROOTFS_DIR/$dirname"
+		rm -rf "${"ROOTFS_DIR/$dirname":?}"
 	fi
 }
 
@@ -109,7 +108,7 @@ post_install() {
 # Only fetch a new rootfs URL if:
 # 1) A rootfs tarball doesn't already exist, or
 # 2) User specified a URL to use
-[[ ! -f "$ROOTFS_TAR" ]] || [[ ! -z "$ROOTFS_URL" ]] && fetch_rootfs
+[[ ! -f "$ROOTFS_TAR" ]] || [[ -n "$ROOTFS_URL" ]] && fetch_rootfs
 
 # Extract tarball
 setup_rootfs

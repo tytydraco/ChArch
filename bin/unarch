@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
@@ -14,13 +14,13 @@ do
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and rootfs instances
 CHROOT_DIR="$HOME/charch"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -64,8 +64,9 @@ unmount_rootfs() {
 	fuser -sk "$1"
 
 	# Do unmounts now
-	local fullpath=`readlink -f "$1"`
-	for path in `mount | awk '{print $3}' | grep "^$fullpath/" | sort -r`
+	local fullpath
+	fullpath="$(readlink -f "$1")"
+	for path in $(mount | awk '{print $3}' | grep "^$fullpath/" | sort -r)
 	do
 		umount -l -f "$path"
 	done
@@ -74,7 +75,7 @@ unmount_rootfs() {
 # Unmount the rootfs filesystems
 if [[ "$UNMOUNT_ALL" -eq 1 ]]
 then
-	for rootfs in `lsarch -s -d "$CHROOT_DIR"`
+	for rootfs in $(lsarch -s -d "$CHROOT_DIR")
 	do
 		[[ -d "$CHROOT_DIR/$rootfs" ]] && unmount_rootfs "$CHROOT_DIR/$rootfs"
 	done

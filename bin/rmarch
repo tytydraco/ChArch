@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
@@ -14,13 +14,13 @@ do
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -80,10 +80,9 @@ fi
 if [[ "$RM_CONTAINER" -eq 1 ]]
 then
 	# Attempt to unmount all rootfs instances
-	unarch -d "$CHROOT_DIR" -a
-	[[ $? -ne 0 ]] && exit 1
+	! unarch -d "$CHROOT_DIR" -a && exit 1
 
-	rm -rf `readlink -f "$CHROOT_DIR"`
+	rm -rf "$(readlink -f "$CHROOT_DIR")"
 	exit 0
 fi
 
@@ -91,9 +90,6 @@ fi
 [[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
 
 # Try to unmount rootfs mounts
-unarch -d "$CHROOT_DIR" "$ROOTFS"
-
-# If unmount failed, exit here to avoid corruption
-[[ $? -ne 0 ]] && exit 1
+! unarch -d "$CHROOT_DIR" "$ROOTFS" && exit 1
 
 rm -rf "$ROOTFS_DIR"

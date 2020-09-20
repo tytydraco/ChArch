@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
@@ -14,13 +14,13 @@ do
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] <OLD NAME> <NEW NAME>
+	echo -n "Usage: $(basename "$0") [OPTIONS] <OLD NAME> <NEW NAME>
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -61,8 +61,7 @@ fi
 [[ -d "$CHROOT_DIR/$2" ]] && err "Rootfs instance with name $2 already exists. Exiting."
 
 # Unmount and exit on fail
-unarch -d "$CHROOT_DIR" "$1"
-[[ $? -ne 0 ]] && exit 1
+! unarch -d "$CHROOT_DIR" "$1" && exit 1
 
 # Clone
 cp -Ra "$CHROOT_DIR/$1" "$CHROOT_DIR/$2"

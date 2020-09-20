@@ -3,7 +3,7 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
@@ -14,7 +14,7 @@ do
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
@@ -23,7 +23,7 @@ CHROOT_DIR="$HOME/charch"
 COMMAND="/usr/bin/env su -l"
 
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS] [NAME]
+	echo -n "Usage: $(basename "$0") [OPTIONS] [NAME]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -66,7 +66,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 # Environmental variables for the chroot
 ENV=(
 	HOME="/root"
-	TERM=${TERM:-xterm-256color}
+	TERM="${TERM:-xterm-256color}"
 )
 
 # Recursive bind a directory, otherwise make a fallback mount if provided
@@ -84,7 +84,7 @@ safe_mount_dir() {
 		mount --make-rslave "$guest_mount"
 	elif [[ ! -z "$2" ]]
 	then
-		mkdir -p "$guets_mount"
+		mkdir -p "$guest_mount"
 		mount -t "$2" "$2" "$guest_mount"
 	fi
 }
@@ -116,7 +116,7 @@ setup_mounts() {
 
 # Enter the chroot with the provided command
 _chroot() {
-	env -i "${ENV[@]}" `which chroot` "$ROOTFS_DIR" $@
+	env -i "${ENV[@]}" "$(which chroot)" "$ROOTFS_DIR" "$@"
 }
 
 [[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."

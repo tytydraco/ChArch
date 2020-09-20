@@ -3,27 +3,24 @@
 
 # Log in red and exit
 err() {
-	echo -e " \e[91m*\e[39m $@"
+	echo -e " \e[91m*\e[39m $*"
 	exit 1
 }
 
 # Check for required dependencies
-for dep in awk basename du find id printf
+for dep in awk basename du id printf
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
 
 # Check for root permissions
-[[ `id -u` -ne 0 ]] && err "No root permissions. Exiting."
+[[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
 CHROOT_DIR="$HOME/charch"
 
-# Default results of find command
-FIND_TYPE="d"
-
 usage() {
-	echo -n "Usage: `basename $0` [OPTIONS]
+	echo -n "Usage: $(basename "$0") [OPTIONS]
 
 Options:
   -d DIRECTORY		Specify a chroot container directory (default: $CHROOT_DIR)
@@ -60,14 +57,14 @@ if [[ "$SIMPLE" -eq 1 ]]
 then
 	for rootfs in "$CHROOT_DIR"/*
 	do
-		echo `basename "$rootfs"`
+		basename "$rootfs"
 	done
 	exit 0
 fi
 
 # List the directory names and full paths
-printf "%-16s\t%-32s\t%-8s\n" "NAME" "PATH"
+printf "%-16s\t%-32s\n" "NAME" "PATH"
 for rootfs in "$CHROOT_DIR"/*
 do
-	printf "%-16s\t%-32s\t%-8s\n" "$rootfs" "$CHROOT_DIR$rootfs"
+	printf "%-16s\t%-32s\n" "$(basename "$rootfs")" "$rootfs"
 done
