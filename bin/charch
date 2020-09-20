@@ -58,7 +58,7 @@ done
 shift $((OPTIND - 1))
 
 # Default command to execute on chroot enter
-COMMAND="${*:-"/usr/bin/env su -l"}"
+COMMAND=("/usr/bin/env" "su" "-l")
 
 # Path to root of rootfs instance
 ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
@@ -116,7 +116,7 @@ setup_mounts() {
 
 # Enter the chroot with the provided command
 _chroot() {
-	env -i "${ENV[@]}" "$(which chroot)" "$ROOTFS_DIR" "$COMMAND"
+	env -i "${ENV[@]}" "$(which chroot)" "$ROOTFS_DIR" "$@"
 }
 
 [[ ! -d "$ROOTFS_DIR" ]] && err "No rootfs instance at $ROOTFS_DIR. Exiting."
@@ -125,7 +125,7 @@ _chroot() {
 setup_mounts
 
 # Enter chroot environment
-_chroot
+_chroot "${@:-${COMMAND[@]}}"
 
 # Try to unmount rootfs mounts
 [[ "$UNMOUNT" -eq 1 ]] && unarch -d "$CHROOT_DIR" -n "$ROOTFS"
