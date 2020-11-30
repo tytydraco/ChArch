@@ -122,6 +122,7 @@ find_mountpoint() {
 # Mount essentials and remound current mount as suid,exec
 setup_mounts() {
 	safe_mount_dir /dev tmpfs
+	safe_mount_dir /dev/pts devpts
 	safe_mount_dir /sys sysfs
 	safe_mount_dir /proc proc
 	safe_mount_file /etc/resolv.conf
