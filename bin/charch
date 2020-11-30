@@ -82,7 +82,6 @@ safe_mount_dir() {
 	then
 		mkdir -p "$guest_mount"
 		mount --rbind "$1" "$guest_mount"
-		mount --make-rslave "$guest_mount"
 	elif [[ -n "$2" ]]
 	then
 		mkdir -p "$guest_mount"
@@ -103,7 +102,6 @@ safe_mount_file() {
 		mkdir -p "${guest_mount%/*}"
 		[[ ! -f "$guest_mount" ]] && touch "$guest_mount"
 		mount --bind "$1" "$guest_mount"
-		mount --make-slave "$guest_mount"
 	fi
 }
 
