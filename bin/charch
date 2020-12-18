@@ -107,12 +107,31 @@ safe_mount_file() {
 	fi
 }
 
+# Find the outermost mountpoint that charch is currently executing from
+find_mountpoint() {
+	local path=`readlink -f "$1"`
+	until mountpoint -q "$path" &>/dev/null
+	do
+		path=${path%/*}
+		path=${path:-/}
+
+		# Break if we reach the end of the filesystem
+		[[ "$path" == "/" ]] && ! mountpoint -q "/" &> /dev/null && break
+	done
+	echo "$path"
+}
+
 # Mount essentials and remound current mount as suid,exec
 setup_mounts() {
 	safe_mount_dir /dev tmpfs
 	safe_mount_dir /sys sysfs
 	safe_mount_dir /proc proc
 	safe_mount_file /etc/resolv.conf
+
+	# Remount data partition with suid to allow sudo to function
+	local root_mount=`find_mountpoint "$CHROOT_DIR"`
+	mount | awk '{print $3}' | grep -q "^$root_mount\$" &&
+		mount -o remount,suid,exec "$root_mount" &> /dev/null
 }
 
 # Enter the chroot with the provided command
