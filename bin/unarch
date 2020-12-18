@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
+#!/system/bin/sh
 # Written by Draco (tytydraco) @ GitHub
+export PATH="/sbin/.magisk/busybox:$PATH"
 
 # Log in red and exit
 err() {
@@ -17,7 +18,7 @@ done
 [[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and rootfs instances
-CHROOT_DIR="$HOME/charch"
+CHROOT_DIR="/data/unencrypted/charch"
 
 # The name of the current rootfs instance
 ROOTFS="rootfs"
