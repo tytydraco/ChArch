@@ -9,7 +9,7 @@ err() {
 }
 
 # Check for required dependencies
-for dep in find id mkdir rm sed tar wc wget
+for dep in find id mkdir rm sed tar wc curl
 do
 	! command -v "$dep" &> /dev/null && err "Unable to locate dependency $dep. Exiting."
 done
@@ -74,7 +74,7 @@ ROOTFS_DIR="$CHROOT_DIR/$ROOTFS"
 fetch_rootfs() {
 	[[ -z "$ROOTFS_URL" ]] && err "No rootfs tarball URL specified. Exiting."
 
-	! wget -qO "$ROOTFS_TAR" "$ROOTFS_URL" && err "Failed to fetch rootfs tarball. Exiting."
+	! curl -s -o "$ROOTFS_TAR" "$ROOTFS_URL" && err "Failed to fetch rootfs tarball. Exiting."
 }
 
 # Extract the rootfs and make it usable
