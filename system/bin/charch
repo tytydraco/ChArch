@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
+#!/system/bin/sh
 # Written by Draco (tytydraco) @ GitHub
+export PATH="/sbin/.magisk/busybox:$PATH"
 
 # Log in red and exit
 err() {
@@ -17,7 +18,7 @@ done
 [[ "$(id -u)" -ne 0 ]] && err "No root permissions. Exiting."
 
 # Path containing rootfs tarball and all rootfs instances
-CHROOT_DIR="$HOME/charch"
+CHROOT_DIR="/data/unencrypted/charch"
 
 # The name of the current rootfs instance
 ROOTFS="rootfs"
@@ -81,7 +82,6 @@ safe_mount_dir() {
 	then
 		mkdir -p "$guest_mount"
 		mount --rbind "$1" "$guest_mount"
-		mount --make-rslave "$guest_mount"
 	elif [[ -n "$2" ]]
 	then
 		mkdir -p "$guest_mount"
@@ -102,16 +102,35 @@ safe_mount_file() {
 		mkdir -p "${guest_mount%/*}"
 		[[ ! -f "$guest_mount" ]] && touch "$guest_mount"
 		mount --bind "$1" "$guest_mount"
-		mount --make-slave "$guest_mount"
 	fi
+}
+
+# Find the outermost mountpoint that charch is currently executing from
+find_mountpoint() {
+	local path=`readlink -f "$1"`
+	until mountpoint -q "$path" &>/dev/null
+	do
+		path=${path%/*}
+		path=${path:-/}
+
+		# Break if we reach the end of the filesystem
+		[[ "$path" == "/" ]] && ! mountpoint -q "/" &> /dev/null && break
+	done
+	echo "$path"
 }
 
 # Mount essentials and remound current mount as suid,exec
 setup_mounts() {
 	safe_mount_dir /dev tmpfs
+	safe_mount_dir /dev/pts devpts
 	safe_mount_dir /sys sysfs
 	safe_mount_dir /proc proc
 	safe_mount_file /etc/resolv.conf
+
+	# Remount data partition with suid to allow sudo to function
+	local root_mount=`find_mountpoint "$CHROOT_DIR"`
+	mount | awk '{print $3}' | grep -q "^$root_mount\$" &&
+		mount -o remount,suid,exec "$root_mount" &> /dev/null
 }
 
 # Enter the chroot with the provided command
